@@ -1,11 +1,12 @@
-###One-shot R tutorial
-- https://github.com/pwasiewi/earin/blob/master/scripts/01stepfirsten.R
+###One-shot R tutorial (EARIN)
+ - https://github.com/pwasiewi/earin/blob/master/scripts/01stepfirsten.R
 
-###Linear regression, gradient descent optimization tutorial
+###Linear regression, gradient descent optimization tutorial (EARIN)
  - https://github.com/pwasiewi/earin/blob/master/scripts/02regrfirsten.R
  
-###data mining projects for studying (in R, Python)
-- https://www.kaggle.com/competitions
+###Data mining projects for studying (in R, Python)
+ - https://github.com/pwasiewi/earin/blob/master/scripts/00kaggle_projects_to_learn.R
+ - https://www.kaggle.com/competitions
 
 ###Fuzzy Logic in Arduino
  - http://www.zerokol.com/2012/09/arduinofuzzy-fuzzy-library-for-arduino.html
