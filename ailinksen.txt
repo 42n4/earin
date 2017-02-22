@@ -2,7 +2,8 @@
 - https://github.com/pwasiewi/earin/blob/master/scripts/01stepfirsten.R
 
 ###Linear regression, gradient descent optimization tutorial
-https://github.com/pwasiewi/earin/blob/master/scripts/02regrfirsten.R
+ - https://github.com/pwasiewi/earin/blob/master/scripts/02regrfirsten.R
+ 
 ###data mining projects for studying (in R, Python)
 - https://www.kaggle.com/competitions
 
