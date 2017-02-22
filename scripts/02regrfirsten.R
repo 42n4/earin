@@ -22,7 +22,7 @@ gradient_descent <- function(func, myderivative, start, alpha=0.05, tol=1e-8) {
   pt1 <- start                              # the start pt1 1D value
   grdnt <- myderivative(pt1)                # my derivative 
   pt2 <- pt1 - alpha*grdnt                  # substract from the start position the rate alpha times the derivative in this point
-  											# this means it goes in the direction of the steepest descent with as small steps as the rate
+                                            # this means it goes in the direction of the steepest descent with as small steps as the rate
   while (abs(func(pt1)-func(pt2)) > tol) {  # if subsequent points are very close to each other, 
     pt1 <- pt2                              # then they are near the optimum point and the execution of the loop is stopped
     grdnt <- myderivative(pt1)              # the point 2 becomes the point 1 and again the same process
@@ -113,7 +113,7 @@ Sys.sleep(2)                                # 2 second pause
 
 
 ################################################################################
-# LINEAR REGRESSION
+# LINEAR REGRESSION - the official function lm
 # generate random data, where y is a random function of the random input x variable (different distributions) 
 x <- runif(1000, -5, 5)
 y <- x + rnorm(1000) + 3
@@ -127,6 +127,7 @@ Sys.sleep(2)                                # 2 second pause
 
 
 ################################################################################
+# LINEAR REGRESSION - my function with cost and theta optimization with constant x and y vectors
 # The cost function - the error (between y and the regression line: y - (Ax+B)) square sum 
 cost <- function(X, y, theta) {
   sum( (X %*% theta - y)^2 ) / (2*length(y))
