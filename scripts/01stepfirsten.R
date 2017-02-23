@@ -8,9 +8,9 @@
 # - in the rstudio the mouse cursor focus on the function name or F1 show appropriate help
 # - all examples in this script need to be executed one after another, later ones may use the previous ones outcomes
 # - In windows R is automatically installed, the first step is to install R for windows server
-# https://mran.microsoft.com/install/mro4mrs/8.0.0/MRO-3.2.2-for-RRE-8.0.0-Windows.exe
+# https://mran.microsoft.com/install/mro/3.3.2/microsoft-r-open-3.3.2.msi
 # downloaded from the site https://mran.microsoft.com/download/mro-for-mrs/
-# and the rstudio: # https://download1.rstudio.org/RStudio-0.99.902.exe
+# and the rstudio: https://download1.rstudio.org/RStudio-1.0.136.exe
 # taken from the site https://www.rstudio.com/products/rstudio/download/
 # - it is necessary to install these packages to run all examples
 # - in linux you should install it on the root account to have it available without problems
