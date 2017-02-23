@@ -75,29 +75,29 @@ a <- c(1, 2, 5, 3, 6,-2, 4)
 a[3]                   # 5
 a[c(1, 3, 5)]          # 1 5 6
 a[2:6]                 # 2 5 3 6 -2
-b <- replicate(10, 2)  # generates 'a' vector with the length equal to 10 and every element equal to 2
-b <- rep(2, 10)        # generates 'a' vector with the length equal to 10 and every element equal to 2 
-b <- 1:10              # 'b' equals 1, 2, 3, 4, 5, 6, 7, 8, 9 10
-b <- seq(1, 10)        # 'b' equals 1, 2, 3, 4, 5, 6, 7, 8, 9 10
-b <- seq(1, 10, 2)     # 'b' equals 1, 3, 5, 7, 9
-b <- seq(0, 1, 0.1)    # 'b' equals 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
-b <- seq(from=0, to=1, by=0.1) # 'b' equals 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+b <- replicate(10, 2)  # generates the b vector with the length equal to 10 and every element equal to 2
+b <- rep(2, 10)        # generates the b vector with the length equal to 10 and every element equal to 2 
+b <- 1:10              # b equals 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10)        # b equals 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10, 2)     # b equals 1, 3, 5, 7, 9
+b <- seq(0, 1, 0.1)    # b equals 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+b <- seq(from=0, to=1, by=0.1) # b equals 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 e <- 10
-a <- c(a, e)           # add the element 'e' to the vector 'a': the method 1
-a <- append(a, e)      # add the element 'e' to the vector 'a': the method 2  
-a <- append(a, e, 2)   # add 'e' at the position 2 + 1 i.e. 3
-a <- append(a, e, 0)   # add 'e' at the position 0 + 1 i.e. 1
-a[length(a) + 1] <- e  # add the element 'e' to the vector 'a': the method 3
+a <- c(a, e)           # add the element e to the vector a: the method 1
+a <- append(a, e)      # add the element e to the vector a: the method 2  
+a <- append(a, e, 2)   # add e at the position 2 + 1 i.e. 3
+a <- append(a, e, 0)   # add e at the position 0 + 1 i.e. 1
+a[length(a) + 1] <- e  # add the element e to the vector a: the method 3
 index <- 2             # index is equal to 2
 a <- a[-index]         # remove the vector element at the position index
 a[-1]                  # shows vector without the first element
 a[-length(a)]          # shows vector without the last element
-a[-c(2, 5)]            # remove the second and fifth element from 'a'
+a[-c(2, 5)]            # remove the second and fifth element from a
 a                      #c( 10,  1,    2,     10,   5,   3,     6,   -2,    4,    10,   10,   10)
 a > 3                  # TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE      
 a[a>3]                 # take elements greater than 3
 a[a==10]               # select vector elements equal to 10
-a[a>1 & a < length(a)] # vector elements greater than 1 and less than the 'a' length 
+a[a>1 & a < length(a)] # vector elements greater than 1 and less than the a length 
 s<-c(jeden=1,dwa=2,trzy=3)# vector with elements, which have names
 names(s)               #elements names
 s[["trzy"]]            #choose the element with the name "trzy"
@@ -107,18 +107,18 @@ s[["trzy"]]            #choose the element with the name "trzy"
 vec <- c(10, 2:10)
 e  <- 10
 e2 <- c(10, 5)
-match(e, vec)          #gives the first matching place of 'e' in the vector 'vec'
-which(vec %in% e)      #returns all matching 'e' indices  in the vector 'vec'
-match(e2, vec)         #gives the first matching substring 'e2' element index in the vector 'vec'
-which(vec %in% e2)     #gives all matching indices of the substring 'e2' in the vector 'vec' 
-e3 <- 1                #'e3' equals 1
-!is.na(match(e3, vec)) #checks whether 'e3' exists within the vector 'vec'
-e3 %in% vec            #checks whether 'e3' exists within the vector 'vec'
+match(e, vec)          #gives the first matching place of e in the vector vec
+which(vec %in% e)      #returns all matching e indices  in the vector vec
+match(e2, vec)         #gives the first matching substring e2 element index in the vector vec
+which(vec %in% e2)     #gives all matching indices of the substring e2 in the vector vec 
+e3 <- 1                #e3 equals 1
+!is.na(match(e3, vec)) #checks whether e3 exists within the vector vec
+e3 %in% vec            #checks whether e3 exists within the vector vec
 c1 <- c(1, 2, 3)
 c2 <- c(2, 3, 5)
-c1[!(c1 %in% c2)]      # 1 - returns elements from the 'c1' vector not existing in 'c2' in this case: 1
+c1[!(c1 %in% c2)]      # 1 - returns elements from the c1 vector not existing in c2 in this case: 1
 setdiff(c1, c2)        # 1 - the second method
-c2[!(c2 %in% c1)]      # 5 - returns elements from the 'c2' vector not existing in 'c1' in this case: 5
+c2[!(c2 %in% c1)]      # 5 - returns elements from the c2 vector not existing in c1 in this case: 5
 setdiff(c2, c1)        # 5 - the second method
 vec <- c(1, 2, 3, 2)   # 
 nlevels(factor(vec))   # counts unique elements in this case: 3
