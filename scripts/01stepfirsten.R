@@ -70,7 +70,7 @@ rm(list = ls(pattern = '^tmp'))     # remove all libraries beginning with 'tmp'
 # Data structures
 #########################################################################################################################
 # VECTORS has only one datatype within
-# indices in R begins with 1, not with 0
+# indices in R begin with 1, not with 0
 a <- c(1, 2, 5, 3, 6,-2, 4)
 a[3]                   # 5
 a[c(1, 3, 5)]          # 1 5 6
