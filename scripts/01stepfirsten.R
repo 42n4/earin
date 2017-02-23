@@ -5,14 +5,14 @@
 # General rules:
 # - indices in R begin with 1, not with 0
 # - R language is case sensitive
-# - in the rstudio the mouse cursor focus on the function name or F1 show appropriate help
+# - in the rstudio the mouse cursor can focus on the function name or F1 shows appropriate help
 # - all examples in this script need to be executed one after another, later ones may use the previous ones outcomes
 # - In windows R is automatically installed, the first step is to install R for windows server
 # https://mran.microsoft.com/install/mro/3.3.2/microsoft-r-open-3.3.2.msi
 # downloaded from the site https://mran.microsoft.com/download/mro-for-mrs/
 # and the rstudio: https://download1.rstudio.org/RStudio-1.0.136.exe
 # taken from the site https://www.rstudio.com/products/rstudio/download/
-# - it is necessary to install these packages to run all examples
+# - it is necessary to install these below mentioned R packages to run all examples
 # - in linux you should install it on the root account to have it available without problems
 pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
