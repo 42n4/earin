@@ -3,7 +3,7 @@
 #########################################################################################################################
 # Made and assembled from various sources by Piotr Wąsiewicz 
 # General rules:
-# - indices in R begins with 1, not with 0
+# - indices in R begin with 1, not with 0
 # - R language is case sensitive
 # - in the rstudio the mouse cursor focus on the function name or F1 show appropriate help
 # - all examples in this script need to be executed one after another, later ones may use the previous ones outcomes
@@ -1173,7 +1173,7 @@ model_autoarima                                # automatically obtained paramete
 myforecast<-forecast(model_autoarima,h=20)
 plot(myforecast)                               # plot for next 20 months with invcreasing prediction error
 Sys.sleep(2)                                   # 2 second pause
-tsdisplay(myforecast$residuals)                # show error analysis, in ACF a significant peak na 23 position MA(11)
+tsdisplay(myforecast$residuals)                # show error analysis, in ACF a significant peak on 23rd position MA(11)
 # it changes a model ARIMA(0,1,1)(0,1,0)[12] to ARIMA(0,1,1)(0,1,11)[12]
 Box.test(myforecast$residuals, lag=12, type="Ljung-Box")
 predict(model_autoarima,20)                    # 20 periods forward
