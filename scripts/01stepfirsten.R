@@ -294,7 +294,7 @@ patient$age           # a column 'age' as a vector
 patient[j]            # the jth column as a dataframe
 patient['age']        # the column 'age' as a dataframe 
 patient[1:2]          # the two first columns as a dataframe
-patient[c('typ', 'state')]
+patient[c('type', 'state')]
 # get the ith and jth dataframe cell
 as.integer(patient[i,][j])# patient[i, ][j] the ith row and jth column cell as an integer
 patient[i, j]         # the ith row and jth column cell 
@@ -330,7 +330,7 @@ new_row <-                                  # a new row
     pacjent_id = 5,
     age = 10,
     type = 'Typ3',
-    state = 'Zdrowy'
+    state = 'Excellent'
   )
 patient <- rbind(patient, new_row)          # RBIND adds a new row to the dataframe
 spatient<- rbind(spatient, new_row)         # or to another dataframe
@@ -343,7 +343,7 @@ patient <- transform(patient, new_col = c(2:6))# add a column to the dataframe: 
 patient <- within(patient, {new_col = NULL})# remove a column from the dataframe: method 3
 merge(patient, spatient, by = "pacjent_id") # join by the column ID patient and spatient
 merge(patient, spatient, 
-      by = c('pacjent_id', 'typ'))          # join by columns ID, Country dataframes patient and spatient
+      by = c('pacjent_id', 'type'))          # join by columns ID, Country dataframes patient and spatient
 cbind(patient, spatient)                    # CBIND join dataframes patient and spatient with the same row number
 #Usuwanie kolumn
 myvars <- names(spatient) %in% c('age', 'type')# selecting attributes in columns age and type 
@@ -419,8 +419,8 @@ df[!is.na(df$age),]                         # removes rows with NA
 #factors cannot be added or multiplied 
 #does not work  $, use [] with an index e.g. levels(x)[1]
 type <- c('Type1', 'Type2', 'Type1', 'Type1')
-type <- factor(typ)                         # Levels: Type1 Type2
-typ
+type <- factor(type)                         # Levels: Type1 Type2
+type
 state <- c('Poor', 'Progress', 'Excellent', 'Poor')
 state <-
   factor(state, ordered = TRUE)             # Excellent-3 Progress-2 Poor-1
@@ -497,11 +497,12 @@ legend(
   bty = 'n'
 )
 #draw many plots in one moment
+x2plot = seq(1:20)
 plot(f)                                     # the first plot
 dev.new()                                   # the second plot
 plot(f(x2plot/20))                          # switching with keyboard arrows
 Sys.sleep(2)                                # 2 seconds pause
-dev.off()                                   # close the second draw
+#dev.off()                                   # close the second draw
 
 #########################################################################################################################
 # attach, detach
@@ -1068,7 +1069,7 @@ caretlibrarylabels<-rbind(caretlibrarylabels,t(data.frame(rda=as.numeric(labels)
 #http://topepo.github.io/caret/modelList.html
 #http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
 #with the HELP of trainControl can be add k-fold crossvalidation
-https://en.wikipedia.org/wiki/Cross-validation_(statistics)#k-fold_cross-validation
+#https://en.wikipedia.org/wiki/Cross-validation_(statistics)#k-fold_cross-validation
 #3-fold crossvalidation with average outcome repeated two times
 ctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 2, 
                      classProbs = FALSE)
@@ -1239,7 +1240,7 @@ plot(myforecast)                               # blue plot myforecast
 Sys.sleep(2)                                   # 2 second pause
 tsdisplay(myforecast$residuals)                # show error analysis
 Box.test(myforecast$residuals, lag=12, type="Ljung-Box")
-
+ 
 #time series
 #http://www.r-bloggers.com/additive-modelling-global-temperature-time-series-revisited/
 #http://www.r-bloggers.com/additive-modelling-and-the-hadcrut3v-global-mean-temperature-series-2/
