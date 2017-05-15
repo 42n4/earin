@@ -1,0 +1,276 @@
+\RequirePackage{atbegshi} 
+\documentclass{beamer}
+\usecolortheme[named=gray]{structure}
+\mode<presentation> {
+%\usetheme{Madrid} % My favorite!
+%\usetheme{Boadilla} % Pretty neat, soft color.
+%\usetheme{default}
+\usetheme{Warsaw}
+%\usetheme{Bergen} % This template has nagivation on the left
+%\usetheme{Frankfurt} % Similar to the default with an extra region at the top.
+%\usecolortheme{seahorse} % Simple and clean template
+%\usetheme{Darmstadt} % not so good
+% Uncomment the following line if you want page numbers and using Warsaw theme
+% \setbeamertemplate{footline}[page number]
+\setbeamercovered{transparent}
+%\setbeamercovered{invisible}
+% To remove the navigation symbols from the bottom of slides%
+\setbeamertemplate{navigation symbols}{} 
+}
+
+\usepackage{ifpdf}
+%\usepackage{graphicx}
+\usepackage{polski} 
+\usepackage[utf8x]{inputenc}
+\usepackage{ucs}
+\usepackage{listings}
+\usepackage{hyperref}
+
+%\usepackage{bm} 
+% For typesetting bold math (not \mathbold)
+%\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
+%
+\title[EARIN]{Data Mining Lectures}
+%
+\author{Piotr Wąsiewicz}
+\institute[ICS PW]
+{
+Institute of Computer Science\\
+\medskip
+{\emph{pwasiewi@elka.pw.edu.pl}}
+}
+\date{\today}
+% \today will show current date. 
+% Alternatively, you can specify a date.
+
+\begin{document}
+%\lstset{language=SQL}
+
+\lstset{
+    language=R,
+    inputencoding=utf8x,
+    extendedchars=\true,
+    literate={ą}{{\k{a}}}1
+             {Ą}{{\k{A}}}1
+             {ę}{{\k{e}}}1
+             {Ę}{{\k{E}}}1
+             {ó}{{\'o}}1
+             {Ó}{{\'O}}1
+             {ś}{{\'s}}1
+             {Ś}{{\'S}}1
+             {ł}{{\l{}}}1
+             {Ł}{{\L{}}}1
+             {ż}{{\.z}}1
+             {Ż}{{\.Z}}1
+             {ź}{{\'z}}1
+             {Ź}{{\'Z}}1
+             {ć}{{\'c}}1
+             {Ć}{{\'C}}1
+             {ń}{{\'n}}1
+             {Ń}{{\'N}}1
+}
+%\lstset{language=c}
+%\lstset{backgroundcolor=\color{brown}}
+%\lstset{linewidth=90mm}
+%\lstset{frameround=tttt}
+\lstset{frameround=trbl}
+\lstset{keywordstyle=\color{black}\bfseries\small}
+\lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
+%\lstset{commentstyle=\textit}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Literature}
+\begin{block}{Books}
+\begin{itemize}
+\item P. Cichosz, Data Mining algorithms: explained using R, Wiley 2015
+\end{itemize}
+\end{block}
+\begin{block}{Internet sites}
+\begin{itemize}
+\item http://www.wiley.com/go/data\_mining\_algorithms
+\item http://www.stat.wisc.edu/$\tilde{\ }$larget/stat302/chap3.pdf
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{Data Sets}
+\begin{block}{Tables}
+\begin{itemize}
+\item A table (a set) consist of several columns, variables, input attributes or rows as vectors of attribute values.
+\item A limited dataset contains also a depended on input attributes variable called the target variable, the target attribute, the class label, the class concept, classes, the target concept, the group identifier, the response variable (regression).
+\item Each row can be called an instance, an object descibed by attribute values.
+\item Attributes can be nominal with a finite number of discrete values, ordinal - like nominal with a total order relation, continouos (numerical, linear) having numerical values.
+\item The target attribute classifies instances (objects) into classes or clusters them into groups.
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Data Sets}
+\begin{block}{Baskets}
+\begin{itemize}
+\item Baskets consists e.g. of different length sets of product ids (ordinal numbers).
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\footnotesize 
+\frametitle{Statistical elements}
+\begin{block}{}
+\begin{itemize}
+\item If the p-value is below the significance level, then the null hypothesis is rejected (no relationship in the given domain).
+\item False positive (type I error) rejected null hypothesis is actually true. This risk increases with a larger significance level.
+\item False negative (type II error) rejected alternative hypothesis is actually true. This risk increases with a smaller significance level.
+\item Pearson's linear correlation coefficient measures the strength of linear relationship between two continuous attributes, null hypothesis - 0 value.
+\item Spearman's rank correlation also has values from -1 to 1 for increasing relationship.
+\item For discrete attributes Chi2 and the loglikelihood ratio (G-test) tests can be taken.
+\item For mixed attributes t-test (with Mann-Whitney-Wilcoxon nonparametric alternative) and f-test - one-way ANOVA (with Kruskal-Wallis alternative) can be used.
+\item The population is to the sample as the sample is to the bootstrap samples (samples with replacement).
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{The model e.g. the decision tree}
+\begin{block}{Create the model to return a prediction after taking an instance as an argument}
+\begin{itemize}
+\item Made a classifier which is trained on a training set with a target attribute (supervised learning tasks using some expert knowledge put in the target variable) and predicts class label values for rows without this target classes. 
+\item Find a regression target values based on input data.
+\item Without any expert knowledge cluster groups using the similarity structure discovered in the input data and write groups identifiers to the target attribute.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Model performance}
+\begin{block}{Quality of predictions}
+\begin{itemize}
+\item The expected quality of predictions on the whole domain including previously unseen instances
+\end{itemize}
+\end{block}
+\begin{block}{Overfitting}
+\begin{itemize}
+\item A model perfoms worse on the whole domain than on the training dataset, where e.g. it has excellent performance.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+%\frametitle{}
+\begin{block}{Model ensembles}
+\begin{itemize}
+\item For three binary classification models with independent mistakes voting reduces error if base model error below 1/2 ($\epsilon^3+3\epsilon^2(1-\epsilon)<\epsilon$)
+\end{itemize}
+\end{block}
+\begin{block}{Base model generation}
+\begin{itemize}
+\item Different sets of training instances: use a different set of training instances to create each base model.
+\item Different sets of attributes: use a different set of attributes to create each base model.
+\item Different algorithms: use a different algorithm to create each base model.
+\item Different parameter setups: use a different algorithm parameter setup to create each base model.
+\item Algorithm randomization: use independent runs of a non-deterministic algorithm to create each base model.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ensemble prediction}
+\begin{block}{}
+\begin{itemize}
+\item Voting: combine base model predictions by (possibly weighted) voting.
+\item Probability averaging: combine base model class probability predictions by (possibly weighted) averaging.
+\item Using as attributes: create a combined model using base model predictions as attributes.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+%\frametitle{Bagging}
+\begin{block}{Bagging}
+\begin{itemize}
+\item Base models created using a single algorithm applied to multiple bootstrap samples of the training set samples drawn at random with replacement - 63.8\% bag, 37.2\% out-of-bag (OOB).
+\item Ensemble prediction by (unweighted) voting.
+\item Requires an unstable algorithm for sufficient base model diversity e.g., decision trees, but after some number of base models it is stabilized.
+\item Moderate prediction improvement, but a useful stabilization effect.
+\end{itemize}
+\end{block}
+\begin{block}{Stacking}
+\begin{itemize}
+\item Different base model algorithms.
+\item Very difficult to design.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Boosting}
+\begin{block}{}
+\begin{itemize}
+\item Increase base model diversity by shifting focus during model creation.
+\item Force subsequent base model to compensate deficiencies of the preceding ones.
+\item Typically used with weight-sensitive classification algorithms increase weights of instances incorrectly classified by the previous model.
+\item Ensemble prediction by weighted voting.
+\item Substantial prediction improvement.
+\item Simple base models work well e.g., small decision trees or decision stumps.
+\item Can not be executed in parallel.
+\item AdaBoost - weighted base models and attributes.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{Random forest}
+\begin{block}{}
+\begin{itemize}
+\item Bagging combined with algorithm randomization for increased base model diversity.
+\item Randomized decision trees sample attributes at each node prior to split selection.
+\item Ensemble prediction by voting.
+\item Maximum or near-maximum fit of base models individual overfitting gets compensated by combining many randomized trees.
+\item Substantial prediction improvement.
+\item Estimate prediction quality using OOB (Out-of-bag) instances.
+\item For each training instance: generate and combine predictions of those and only those trees for which the instance is OOB
+\item Use these predictions to calculate the misclassification error (or another prediction quality indicator).
+\item Estimate the predictive utility of attributes by measuring error on the mutated data.
+\end{itemize}
+\end{block}
+\end{frame}
+
+% End of slides
+\end{document} 
+
+\begin{frame}
+\frametitle{}
+\begin{block}{}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\scriptsize
+\frametitle{}
+\begin{lstlisting}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+%\frametitle{}
+%\includegraphics[width=11.8cm]{11gdiag\_01.jpg}
+\small
+\begin{block}{}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+\end{frame}
+
