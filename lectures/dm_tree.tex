@@ -1,0 +1,204 @@
+\RequirePackage{atbegshi} 
+\documentclass{beamer}
+\usecolortheme[named=gray]{structure}
+\mode<presentation> {
+%\usetheme{Madrid} % My favorite!
+%\usetheme{Boadilla} % Pretty neat, soft color.
+%\usetheme{default}
+\usetheme{Warsaw}
+%\usetheme{Bergen} % This template has nagivation on the left
+%\usetheme{Frankfurt} % Similar to the default with an extra region at the top.
+%\usecolortheme{seahorse} % Simple and clean template
+%\usetheme{Darmstadt} % not so good
+% Uncomment the following line if you want page numbers and using Warsaw theme
+% \setbeamertemplate{footline}[page number]
+\setbeamercovered{transparent}
+%\setbeamercovered{invisible}
+% To remove the navigation symbols from the bottom of slides%
+\setbeamertemplate{navigation symbols}{} 
+}
+
+\usepackage{ifpdf}
+%\usepackage{graphicx}
+\usepackage{polski} 
+\usepackage[utf8x]{inputenc}
+\usepackage{ucs}
+\usepackage{listings}
+\usepackage{hyperref}
+
+%\usepackage{bm} 
+% For typesetting bold math (not \mathbold)
+%\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
+%
+\title[EARIN]{Data Mining Lectures - Decision trees}
+%
+\author{Piotr Wąsiewicz}
+\institute[ICS PW]
+{
+Institute of Computer Science\\
+\medskip
+{\emph{pwasiewi@elka.pw.edu.pl}}
+}
+\date{\today}
+% \today will show current date. 
+% Alternatively, you can specify a date.
+
+\begin{document}
+%\lstset{language=SQL}
+
+\lstset{
+    language=R,
+    inputencoding=utf8x,
+    extendedchars=\true,
+    literate={ą}{{\k{a}}}1
+             {Ą}{{\k{A}}}1
+             {ę}{{\k{e}}}1
+             {Ę}{{\k{E}}}1
+             {ó}{{\'o}}1
+             {Ó}{{\'O}}1
+             {ś}{{\'s}}1
+             {Ś}{{\'S}}1
+             {ł}{{\l{}}}1
+             {Ł}{{\L{}}}1
+             {ż}{{\.z}}1
+             {Ż}{{\.Z}}1
+             {ź}{{\'z}}1
+             {Ź}{{\'Z}}1
+             {ć}{{\'c}}1
+             {Ć}{{\'C}}1
+             {ń}{{\'n}}1
+             {Ń}{{\'N}}1
+}
+%\lstset{language=c}
+%\lstset{backgroundcolor=\color{brown}}
+%\lstset{linewidth=90mm}
+%\lstset{frameround=tttt}
+\lstset{frameround=trbl}
+\lstset{keywordstyle=\color{black}\bfseries}
+\lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
+%\lstset{commentstyle=\textit}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{Decision trees}
+\begin{block}{}
+\begin{itemize}
+\item A hierarchical structure representing dataset/domain partitioning nodes: splits based on attribute-value conditions and leaves: class labels or probability distributions.
+\item Prediction by descending the tree at each node dispatching along a branch at each leaf a class label or probability determined.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\begin{block}{Splits for discrete attributes}
+\begin{itemize}
+\item Value-based: split outcomes correspond to single attribute values.
+\item Equality based: split outcomes correspond to binary equality test results. 
+\item Partition-based: split outcomes correspond to attribute value subsets.
+\item Membership-based: split outcomes correspond to binary membership test results.
+\end{itemize}
+\end{block}
+\begin{block}{Splits for numeric attributes}
+\begin{itemize}
+\item Inequality based: split outcomes correspond to binary inequality test results.
+\item Interval-based: split outcomes correspond to attribute value interval.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Decision tree growing}
+\begin{block}{}
+\begin{enumerate}
+\item create the root node and mark it as open;
+\item assign all training instances from T to the root node;
+\item while there are open nodes:
+\begin{itemize}
+\item[A.] select an open node n;
+\item[B.] calculate class distribution $P(d|n)$ based on T[n];
+\item[C.] assign class label $argmax[d]P(d|n)$ to n;
+\item[D.] if stop criteria are satisfied for n mark n as a closed leaf; else
+\begin{enumerate}
+\item select a split t for n; 
+\item for each outcome r of split t:
+\item[A.] create a descendant node n[r] corresponding to r and mark it as open;
+\item[B.] assign all instances from T[n,t=r] to n[r];
+\item[C.] mark n as a closed node;
+\end{enumerate}
+\end{itemize}
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\begin{block}{Stop criteria}
+\begin{itemize}
+\item Uniform class: all training instances in the node are of the same class.
+\item No instances left: the set of training instances assigned to the node is empty.
+\item No splits left: there is no split that can be applied to further partition the current subset of training instances.
+\item Can be relaxed:
+\begin{enumerate}
+\item most instances of the same class (low class impurity),
+\item less than a specified minimum number of instances,
+\item the best available split is not sufficiently good.
+\end{enumerate}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{}
+\begin{block}{Split selection}
+\begin{itemize}
+\item Strict stop criteria guarantee training set error minimization.
+\item Split selection responsible for overfitting avoidance.
+\item Ockham's razor: among trees with the same training set error prefer smaller ones and it can be achieved by minimizing class impurity e.g. its entropy.
+\end{itemize}
+\end{block}
+\begin{block}{Pruning and probability classification}
+\begin{itemize}
+\item In pruning the complexity parameter (cp) controls the tradeoff between error and size
+\item Class probability distribution at leaves enables probabilistic prediction
+\item Can be used to minimize misclassification costs; instead of predicting the most probable class predict the class with the minimum expected cost,
+\item Can be used to adjust the operating point for binary classification e.g. obtaining the ROC curve
+\end{itemize}
+\end{block}
+\end{frame}
+
+% End of slides
+\end{document} 
+
+\begin{frame}
+\frametitle{}
+\begin{block}{}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\scriptsize
+\frametitle{}
+\begin{lstlisting}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+%\frametitle{}
+%\includegraphics[width=11.8cm]{11gdiag\_01.jpg}
+\small
+\begin{block}{}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+\end{frame}
+
