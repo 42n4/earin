@@ -28,6 +28,123 @@ pkgcheck <- pkglist %in% row.names(installed.packages())
 paste(pkglist[!pkgcheck],collapse=' ')
 for(i in pkglist){ library(i, character.only = TRUE);}
 ##############
+#2-1-1.R
+##############
+data(weather, package="dmr.data")
+data(weatherc, package="dmr.data")
+data(weatherr, package="dmr.data")
+##############
+#2-4-1.R
+##############
+bs.mean <- function(v) { sum(v)/length(v) }
+
+# demonstration
+bs.mean(weatherc$temperature)
+mean(weatherc$temperature)
+##############
+#2-4-2.R
+##############
+bs.weighted.mean <- function(v, w=rep(1, length(v))) { sum(w*v)/sum(w) }
+
+# demonstration
+bs.weighted.mean(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
+weighted.mean(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
+##############
+#2-4-3.R
+##############
+bs.median <- function(v)
+{
+  k1 <- (m <- length(v))%/%2+1
+  k2 <- (m+1)%/%2
+  ((v <- sort(v))[k1]+v[k2])/2
+}
+
+# demonstration
+bs.median(weatherc$temperature)
+bs.median(weatherc$temperature[weatherc$play=="yes"])
+median(weatherc$temperature)
+median(weatherc$temperature[weatherc$play=="yes"])
+##############
+#2-4-4.R
+##############
+weighted.median <- function(v, w=rep(1, length(v)))
+{
+  v <- v[ord <- order(v)]
+  w <- w[ord]
+  tw <- (sw <- cumsum(w))[length(sw)]
+  mean(v[which(sw>=0.5*tw & tw-shift.right(sw, 0)>=0.5*tw)])
+}
+
+# demonstration
+weighted.median(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
+median(c(weatherc$temperature[weatherc$play=="no"],
+         rep(weatherc$temperature[weatherc$play=="yes"], 5)))
+weighted.median(weatherc$temperature, ifelse(weatherc$play=="yes", 0.2, 1))
+median(c(weatherc$temperature[weatherc$play=="yes"],
+         rep(weatherc$temperature[weatherc$play=="no"], 5)))
+##############
+#2-4-5.R
+##############
+bs.rank <- function(v)
+{
+  r.min <- match(v, sort(v))
+  r.max <- length(v)+1-match(v, rev(sort(v)))
+  (r.min+r.max)/2
+}
+
+# demonstration
+bs.rank(weatherr$playability)
+rank(weatherr$playability)
+##############
+#2-4-6.R
+##############
+ord <- function(v, k=1:length(v))
+{
+  sort(v)[k]
+}
+
+# demonstration
+ord(weatherr$playability, 11)
+weatherr$playability[rank(weatherr$playability, ties.method="first")==11]
+ord(weatherr$playability, 10:13)
+weatherr$playability[rank(weatherr$playability, ties.method="first") %in% 10:13]
+##############
+#2-4-7.R
+##############
+bs.quantile <- function(v, p=c(0, 0.25, 0.5, 0.75, 1))
+{
+  b <- 1-p
+  k <- floor((ps <- p*length(v))+b)
+  beta <- ps+b-k
+  `names<-`((1-beta)*(v <- sort(v))[k]+beta*(ifelse(k<length(v), v[k+1], v[k])), p)
+}
+
+# demonstration
+bs.quantile(weatherc$temperature)
+quantile(weatherc$temperature)
+bs.quantile(weatherc$temperature[weatherc$play=="yes"])
+quantile(weatherc$temperature[weatherc$play=="yes"])
+##############
+#2-4-8.R
+##############
+bs.var <- function(v) { sum((v-mean(v))^2)/(length(v)-1) }
+
+# demonstration
+bs.var(weatherr$playability)
+var(weatherr$playability)
+##############
+#2-4-9.R
+##############
+## variance that returns 0 for 1-element vectors and NaN for empty vectors
+var1 <- function(v) { switch(min(length(v), 2)+1, NaN, 0, var(v)) }
+
+# demonstration
+var1(1:2)
+var1(1)
+var1(weatherr$temperature[weatherr$playability<0.75])
+var1(weatherr$temperature[weatherr$playability>=0.75])
+var1(weatherr$temperature[weatherr$playability>=0.8])
+##############
 #2-4-10.R
 ##############
 weighted.var <- function(v, w=rep(1, length(v)))
@@ -38,7 +155,7 @@ weighted.var <- function(v, w=rep(1, length(v)))
   sw/(sw^2-ssw)*sum(w*(v-wm)^2)
 }
 
-  # demonstration
+# demonstration
 weighted.var(weatherr$playability)
 weighted.var(weatherr$playability, ifelse(weatherr$outlook=="rainy", 2, 1))
 ##############
@@ -48,7 +165,7 @@ weighted.var(weatherr$playability, ifelse(weatherr$outlook=="rainy", 2, 1))
 weighted.var1 <- function(v, w=rep(1, length(w)))
 { switch(min(length(v), 2)+1, NaN, 0, weighted.var(v, w)) }
 
-  # demonstration
+# demonstration
 weighted.var1(1:2, 1:2)
 weighted.var1(1, 2)
 weighted.var1(weatherr$temperature[weatherr$playability<0.75],
@@ -62,7 +179,7 @@ weighted.var1(weatherr$temperature[weatherr$playability>=0.8],
 ##############
 bs.sd <- function(v) { sqrt(sum((v-mean(v))^2)/(length(v)-1)) }
 
-  # demonstration
+# demonstration
 bs.sd(weatherr$playability)
 sd(weatherr$playability)
 ##############
@@ -70,7 +187,7 @@ sd(weatherr$playability)
 ##############
 varcoef <- function(v) { sqrt(sum((v-(m <- mean(v)))^2)/(length(v)-1))/m }
 
-  # demonstration
+# demonstration
 varcoef(weatherr$playability)
 varcoef(-weatherr$playability)
 ##############
@@ -78,7 +195,7 @@ varcoef(-weatherr$playability)
 ##############
 relsd <- function(v) { abs(varcoef(v)) }
 
-  # demonstration
+# demonstration
 relsd(weatherr$playability)
 relsd(-weatherr$playability)
 ##############
@@ -86,7 +203,7 @@ relsd(-weatherr$playability)
 ##############
 bs.mad <- function(v, scale=1/qnorm(0.75)) { scale*median(abs(v-median(v))) }
 
-  # demonstration
+# demonstration
 bs.mad(weatherr$playability, scale=1)
 mad(weatherr$playability, constant=1)
 bs.mad(weatherr$playability)
@@ -97,14 +214,14 @@ sd(weatherr$playability)
 ##############
 iqr <- function(v)  { unname(diff(quantile(v, c(0.25, 0.75)))) }
 
-  # demonstration
+# demonstration
 iqr(weatherc$temperature)
 ##############
 #2-4-17.R
 ##############
 qd <- function(v) { unname(diff(q <- quantile(v, c(0.25, 0.75)))/sum(q)) }
 
-  # demonstration
+# demonstration
 qd(weatherc$temperature)
 ##############
 #2-4-18.R
@@ -127,17 +244,9 @@ modal <- function(v)
     sort(unique(v))[m]
 }
 
-  # demonstration
+# demonstration
 modal(weather$outlook)
 modal(weatherr$temperature)
-##############
-#2-4-1.R
-##############
-bs.mean <- function(v) { sum(v)/length(v) }
-
-  # demonstration
-bs.mean(weatherc$temperature)
-mean(weatherc$temperature)
 ##############
 #2-4-20.R
 ##############
@@ -150,7 +259,7 @@ weighted.modal <- function(v, w=rep(1, length(v)))
     sort(unique(v))[m]
 }
 
-  # demonstration
+# demonstration
 weighted.modal(weather$outlook)
 weighted.modal(weather$outlook, w=ifelse(weather$play=="yes", 2, 1))
 ##############
@@ -158,14 +267,14 @@ weighted.modal(weather$outlook, w=ifelse(weather$play=="yes", 2, 1))
 ##############
 prob <- function(v, v1) { sum(v==v1)/length(v) }
 
-  # demonstration
+# demonstration
 prob(weather$outlook, "rainy")
 ##############
 #2-4-22.R
 ##############
 pdisc <- function(v, ...) { (count <- table(v, ..., dnn=NULL))/sum(count) }
 
-  # demonstration
+# demonstration
 pdisc(weather$outlook)
 pdisc(weather$outlook, weather$temperature)
 ##############
@@ -177,14 +286,14 @@ pcond <- function(v1, v2)
   t(apply(count <- table(v1, v2, dnn=NULL), 1, "/", colSums(count)))
 }
 
-  # demonstration
+# demonstration
 pcond(weather$outlook, weather$play)
 ##############
 #2-4-24.R
 ##############
 weighted.prob <- function(v, v1, w=rep(1, length(v))) { sum(w[v==v1])/sum(w) }
 
-  # demonstration
+# demonstration
 weighted.prob(weather$outlook, "rainy")
 weighted.prob(weather$outlook, "rainy", w=ifelse(weather$play=="yes", 2, 1))
 ##############
@@ -196,7 +305,7 @@ weighted.pdisc <- function(v, ..., w=rep(1:length(v)))
   (count <- weighted.table(v, ..., w=w))/sum(count)
 }
 
-  # demonstration
+# demonstration
 weighted.pdisc(weather$outlook, w=ifelse(weather$play=="yes", 2, 1))
 weighted.pdisc(weather$outlook, weather$temperature,
                w=ifelse(weather$play=="yes", 2, 1))
@@ -208,7 +317,7 @@ entropy.p <- function(p) { sum(-plogp(p)) }
 
 entropy <- function(v) { entropy.p(pdisc(v)) }
 
-  # demonstration
+# demonstration
 entropy.p(c(1/5, 2/5, 3/5))
 entropy(weather$outlook)
 entropy(weather$play)
@@ -222,7 +331,7 @@ gini.p <- function(p) { 1-sum(p^2) }
 
 gini <- function(v) { gini.p(pdisc(v)) }
 
-  # demonstration
+# demonstration
 gini.p(c(1/5, 2/5, 3/5))
 gini(weather$outlook)
 gini(weather$play)
@@ -231,10 +340,10 @@ gini(weather$play[weather$outlook!="overcast"])
 ##############
 #2-4-28.R
 ##############
-  # plot the entropy
+# plot the entropy
 curve(-x*log(x)-(1-x)*log(1-x), from=0, to=1,
       xlab="p", ylab="", ylim=c(-0.02, 0.7), lty=1)
-  # and add the plot of the Gini index
+# and add the plot of the Gini index
 curve(1-x^2-(1-x)^2, from=0, to=1, add=TRUE, lty=2)
 legend("topright", legend=c("entropy", "gini"), lty=1:2)
 ##############
@@ -247,18 +356,10 @@ prob.ci.par <- function(v, v1=1, delta=0.05)
        high=p+u*sp)
 }
 
-  # demonstration
+# demonstration
 prob.ci.par(weather$play, "yes")
 prob.ci.par(weather$play, "yes", delta=0.01)
 prob.ci.par(weather$play, "yes", delta=0.1)
-##############
-#2-4-2.R
-##############
-bs.weighted.mean <- function(v, w=rep(1, length(v))) { sum(w*v)/sum(w) }
-
-  # demonstration
-bs.weighted.mean(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
-weighted.mean(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
 ##############
 #2-4-30.R
 ##############
@@ -269,7 +370,7 @@ prob.ci.boot <- function(v, v1=1, delta=0.05, m=1000)
   list(p=prob(v, v1), low=q[1], high=q[2])
 }
 
-  # demonstration
+# demonstration
 prob.ci.boot(weather$play, "yes")
 prob.ci.boot(weather$play, "yes", delta=0.01)
 prob.ci.boot(weather$play, "yes", delta=0.1)
@@ -283,7 +384,7 @@ mest <- function(n1, n, m=2, p0=1/m) { (n1+m*p0)/(n+m) }
 mprob <- function(v, v1, m=nlevels(v), p0=1/nlevels(v))
 { mest(sum(v==v1), length(v), m, p0) }
 
-  # demonstration
+# demonstration
 mest(0, 10, 1, 0.5)
 mest(0, 10, 2, 0.5)
 mest(10, 10, 1, 0.5)
@@ -303,7 +404,7 @@ laest <- function(n1, n, m=2) { mest(n1, n, m)  }
 
 laprob <- function(v, v1) { mprob(v, v1) }
 
-  # demonstration
+# demonstration
 laest(0, 10, 2)
 mest(0, 10, 2)
 laest(10, 10, 2)
@@ -319,7 +420,7 @@ mprob(weather$play[weather$outlook=="overcast"], "no", m=2, p0=0.5)
 ## m-mean that incorporates m fictitious values with a specified mean m0
 mmean <- function(v, m=2, m0=mean(v)) { (sum(v)+m*m0)/(length(v)+m) }
 
-  # demonstration
+# demonstration
 mmean(weatherr$playability)
 mmean(weatherr$playability, m=0)
 mmean(weatherr$playability, m0=0.5)
@@ -333,7 +434,7 @@ mmean(weatherr$playability[weatherr$temperature<25], m0=mean(weatherr$playabilit
 mvar <- function(v, m=2, m0=mean(v), s02=var(v))
 { (sum((v-mmean(v, m, m0))^2)+max(m-1, 0)*s02)/max(length(v)+m-2, 1)  }
 
-  # demonstration
+# demonstration
 mvar(weatherr$playability)
 mvar(weatherr$playability, m=0)
 mvar(weatherr$playability, s02=0.05)
@@ -342,153 +443,17 @@ mvar(weatherr$playability[weatherr$temperature<25], m=0)
 mvar(weatherr$playability[weatherr$temperature<25],
      m0=mean(weatherr$playability), s02=var(weatherr$playability))
 ##############
-#2-4-3.R
-##############
-bs.median <- function(v)
-{
-  k1 <- (m <- length(v))%/%2+1
-  k2 <- (m+1)%/%2
-  ((v <- sort(v))[k1]+v[k2])/2
-}
-
-  # demonstration
-bs.median(weatherc$temperature)
-bs.median(weatherc$temperature[weatherc$play=="yes"])
-median(weatherc$temperature)
-median(weatherc$temperature[weatherc$play=="yes"])
-##############
-#2-4-4.R
-##############
-weighted.median <- function(v, w=rep(1, length(v)))
-{
-  v <- v[ord <- order(v)]
-  w <- w[ord]
-  tw <- (sw <- cumsum(w))[length(sw)]
-  mean(v[which(sw>=0.5*tw & tw-shift.right(sw, 0)>=0.5*tw)])
-}
-
-  # demonstration
-weighted.median(weatherc$temperature, ifelse(weatherc$play=="yes", 5, 1))
-median(c(weatherc$temperature[weatherc$play=="no"],
-         rep(weatherc$temperature[weatherc$play=="yes"], 5)))
-weighted.median(weatherc$temperature, ifelse(weatherc$play=="yes", 0.2, 1))
-median(c(weatherc$temperature[weatherc$play=="yes"],
-         rep(weatherc$temperature[weatherc$play=="no"], 5)))
-##############
-#2-4-5.R
-##############
-bs.rank <- function(v)
-{
-  r.min <- match(v, sort(v))
-  r.max <- length(v)+1-match(v, rev(sort(v)))
-  (r.min+r.max)/2
-}
-
-  # demonstration
-bs.rank(weatherr$playability)
-rank(weatherr$playability)
-##############
-#2-4-6.R
-##############
-ord <- function(v, k=1:length(v))
-{
-  sort(v)[k]
-}
-
-  # demonstration
-ord(weatherr$playability, 11)
-weatherr$playability[rank(weatherr$playability, ties.method="first")==11]
-ord(weatherr$playability, 10:13)
-weatherr$playability[rank(weatherr$playability, ties.method="first") %in% 10:13]
-##############
-#2-4-7.R
-##############
-bs.quantile <- function(v, p=c(0, 0.25, 0.5, 0.75, 1))
-{
-  b <- 1-p
-  k <- floor((ps <- p*length(v))+b)
-  beta <- ps+b-k
-  `names<-`((1-beta)*(v <- sort(v))[k]+beta*(ifelse(k<length(v), v[k+1], v[k])), p)
-}
-
-  # demonstration
-bs.quantile(weatherc$temperature)
-quantile(weatherc$temperature)
-bs.quantile(weatherc$temperature[weatherc$play=="yes"])
-quantile(weatherc$temperature[weatherc$play=="yes"])
-##############
-#2-4-8.R
-##############
-bs.var <- function(v) { sum((v-mean(v))^2)/(length(v)-1) }
-
-  # demonstration
-bs.var(weatherr$playability)
-var(weatherr$playability)
-##############
-#2-4-9.R
-##############
-## variance that returns 0 for 1-element vectors and NaN for empty vectors
-var1 <- function(v) { switch(min(length(v), 2)+1, NaN, 0, var(v)) }
-
-  # demonstration
-var1(1:2)
-var1(1)
-var1(weatherr$temperature[weatherr$playability<0.75])
-var1(weatherr$temperature[weatherr$playability>=0.75])
-var1(weatherr$temperature[weatherr$playability>=0.8])
-##############
-#2-5-10.R
-##############
-bs.wilcox.test <- function(v, v01)
-{
-  subsets <- split(v, v01)
-  ranks <- unname(split(rank(v), v01))
-  cn <- unname(sapply(subsets, length))
-  mu <- cn[1]*cn[2]/2
-  su <- sqrt(cn[1]*cn[2]*(cn[1]+cn[2]+1)/12)
-
-  u <- sum(ranks[[1]])-cn[1]*(cn[1]+1)/2
-#  u <- sum(sapply(subsets[[2]],
-#                  function(v2) sum(v2<subsets[[1]])+sum(v2==subsets[[1]])/2))
-  list(statistic=u, p.value=2*(1-pnorm(abs(u-mu)/su)))
-}
-
-  # demonstration
-bs.wilcox.test(weatherc$temperature, weatherc$play)
-wilcox.test(temperature~play, weatherc, exact=FALSE, correct=FALSE)
-##############
-#2-5-11.R
-##############
-bs.kruskal.test <- function(v1, v2)
-{
-  subsets <- split(v1, v2)
-  ranks <- split((rank.all <- rank(v1)), v2)
-  cn <- unname(sapply(subsets, length))
-  mr <- sapply(ranks, mean)
-  mr.a <- mean(rank.all)
-
-  k <- (length(v1)-1)*sum(cn*(mr-mr.a)^2)/
-         sum(sapply(ranks, function(r) sum((r-mr.a)^2)))
-  list(statistic=k, p.value=1-pchisq(k, length(subsets)-1))
-}
-
-  # demonstration
-bs.kruskal.test(weatherc$temperature, weatherc$play)
-kruskal.test(temperature~play, weatherc)
-bs.kruskal.test(weatherc$temperature, weatherc$outlook)
-kruskal.test(temperature~outlook, weatherc)
-##############
 #2-5-1.R
 ##############
 corl.test <- function(v1, v2)
 {
   rho <- sum((v1-(m1 <- mean(v1)))*(v2-(m2 <- mean(v2))))/
-           sqrt(sum((v1-m1)^2)*sum((v2-m2)^2))
+    sqrt(sum((v1-m1)^2)*sum((v2-m2)^2))
   ts <- rho*sqrt((df <- length(v1)-2)/(1-rho^2))
   list(rho=rho, statistic=ts, p.value=2*(1-pt(abs(ts), df)))
 }
 
-  # demonstration
+# demonstration
 corl.test(weatherr$temperature, weatherr$playability)
 cor.test(weatherr$temperature, weatherr$playability, method="pearson")
 corl.test(weatherr$temperature, -weatherr$playability)
@@ -498,7 +463,7 @@ cor.test(weatherr$temperature, -weatherr$playability, method="pearson")
 ##############
 corr.test <- function(v1, v2) { corl.test(rank(v1), rank(v2)) }
 
-  # demonstration
+# demonstration
 corr.test(weatherr$temperature, weatherr$playability)
 cor.test(weatherr$temperature, weatherr$playability, method="spearman")
 corr.test(weatherr$temperature, -weatherr$playability)
@@ -514,7 +479,7 @@ bs.chisq.test <- function(v1, v2)
   list(statistic=chi2, p.value=1-pchisq(chi2, (nrow(o12)-1)*(ncol(o12)-1)))
 }
 
-  # demonstration
+# demonstration
 bs.chisq.test(weather$outlook, weather$play)
 chisq.test(weather$outlook, weather$play)
 ##############
@@ -528,7 +493,7 @@ g.test <- function(v1, v2)
   list(statistic=g, p.value=1-pchisq(g, (nrow(o12)-1)*(ncol(o12)-1)))
 }
 
-  # demonstration
+# demonstration
 g.test(weather$outlook, weather$play)
 ##############
 #2-5-5.R
@@ -540,7 +505,7 @@ entropy.cond <- function(v1, v2)
   sum(p2*mapply(function(i, p2i) entropy.p(p12[,i]/p2i), 1:ncol(p12), p2))
 }
 
-  # demonstration
+# demonstration
 entropy.cond(weather$play, weather$outlook)
 entropy.cond(weather$play, weather$outlook=="rainy")
 ##############
@@ -554,9 +519,9 @@ mutinfo <- function(v1, v2)
   sum(p12*logp(p12/(p1%o%p2)), na.rm=TRUE)
 }
 
-  # demonstration
+# demonstration
 mutinfo(weather$outlook, weather$play)
-  # this should be the same
+# this should be the same
 entropy(weather$play)-entropy.cond(weather$play, weather$outlook)
 entropy(weather$outlook)-entropy.cond(weather$outlook, weather$play)
 g.test(weather$outlook, weather$play)$statistic/(2*log(2)*nrow(weather))
@@ -569,7 +534,7 @@ symunc <- function(v1, v2)
   2*mutinfo(v1, v2)/(entropy(v1)+entropy(v2))
 }
 
-  # demonstration
+# demonstration
 symunc(weather$outlook, weather$temperature)
 symunc(weather$outlook, weather$play)
 ##############
@@ -581,12 +546,12 @@ bs.t.test <- function(v, v01)
   s2 <- unname(tapply(v, v01, var))
   cn <- unname(tapply(v, v01, length))
   sp <- sqrt((s2[1]*(cn[1]-1)+s2[2]*(cn[2]-1))/(sum(cn)-2))
-
+  
   ts <- (m[1]-m[2])/(sp*sqrt(sum(1/cn)))
   list(statistic=ts, p.value=2*(1-pt(abs(ts), sum(cn)-2)))
 }
 
-  # demonstration
+# demonstration
 bs.t.test(weatherc$temperature, weatherc$play)
 t.test(temperature~play, weatherc, var.equal=TRUE)
 ##############
@@ -599,20 +564,61 @@ f.test <- function(v1, v2)
   cn <- unname(sapply(subsets, length))
   m.a <- mean(v1)
   cn.a <- length(v1)
-
+  
   f <- (sum(cn*(m-m.a)^2)/((k <- length(subsets))-1))/
-         (sum(sapply(1:length(subsets),
-                     function(i) sum((subsets[[i]]-m[i])^2)))/((cn.a-k)))
+    (sum(sapply(1:length(subsets),
+                function(i) sum((subsets[[i]]-m[i])^2)))/((cn.a-k)))
   list(statistic=f, p.value=1-pf(f, k-1, cn.a-k))
 }
 
-  # demonstration
+# demonstration
 f.test(weatherc$temperature, weatherc$outlook)
 f.test(weatherc$temperature, weatherc$play)
 anova(lm(temperature~outlook, weatherc))
 anova(lm(temperature~play, weatherc))
 abs(sqrt(f.test(weatherc$temperature, weatherc$play)$statistic)-
-  abs(t.test(temperature~play, weatherc, var.equal=TRUE)$statistic))
+      abs(t.test(temperature~play, weatherc, var.equal=TRUE)$statistic))
+##############
+#2-5-10.R
+##############
+bs.wilcox.test <- function(v, v01)
+{
+  subsets <- split(v, v01)
+  ranks <- unname(split(rank(v), v01))
+  cn <- unname(sapply(subsets, length))
+  mu <- cn[1]*cn[2]/2
+  su <- sqrt(cn[1]*cn[2]*(cn[1]+cn[2]+1)/12)
+  
+  u <- sum(ranks[[1]])-cn[1]*(cn[1]+1)/2
+  #  u <- sum(sapply(subsets[[2]],
+  #                  function(v2) sum(v2<subsets[[1]])+sum(v2==subsets[[1]])/2))
+  list(statistic=u, p.value=2*(1-pnorm(abs(u-mu)/su)))
+}
+
+# demonstration
+bs.wilcox.test(weatherc$temperature, weatherc$play)
+wilcox.test(temperature~play, weatherc, exact=FALSE, correct=FALSE)
+##############
+#2-5-11.R
+##############
+bs.kruskal.test <- function(v1, v2)
+{
+  subsets <- split(v1, v2)
+  ranks <- split((rank.all <- rank(v1)), v2)
+  cn <- unname(sapply(subsets, length))
+  mr <- sapply(ranks, mean)
+  mr.a <- mean(rank.all)
+  
+  k <- (length(v1)-1)*sum(cn*(mr-mr.a)^2)/
+    sum(sapply(ranks, function(r) sum((r-mr.a)^2)))
+  list(statistic=k, p.value=1-pchisq(k, length(subsets)-1))
+}
+
+# demonstration
+bs.kruskal.test(weatherc$temperature, weatherc$play)
+kruskal.test(temperature~play, weatherc)
+bs.kruskal.test(weatherc$temperature, weatherc$outlook)
+kruskal.test(temperature~outlook, weatherc)
 ##############
 #2-6-1.R
 ##############
@@ -635,6 +641,7 @@ barplot(`names<-`(ave(weatherr$playability, weatherr$outlook, weatherr$wind),
                   interaction(weatherr$outlook, weatherr$wind)),
         las=2, main="Mean playability in outlook-wind subsets")
 lines(c(0, 17), rep(mean(weatherr$playability), 2), lty=2)
+
 ##############
 #3-1-1.R
 ##############
@@ -2459,246 +2466,22 @@ barplot(colMeans(mc.res$Vehicle01$naiveBayes.NULL$mc[,7:9]),
         main="Two-class, naiveBayes", ylab="Cost reduction",
         las=2, ylim=c(-0.26, 0.15),
         names.arg=c("resample", "mincost", "relabel"))
+
+
 ##############
 #7-1-1.R
 ##############
 library(dmr.util)
 library(rpart)
 
-#data(Soybean, package="mlbench")
-pairs(iris[1:4], main = "Edgar Anderson's Iris Data", pch = 21, bg = c("red", "green3", "blue")[unclass(iris$Species)])
-mdata<-iris
+data(Soybean, package="mlbench")
+
 set.seed(12)
-rs <- runif(nrow(mdata))
-s.train <- mdata[rs>=0.33,]
-s.test <- mdata[rs<0.33,]
+rs <- runif(nrow(Soybean))
+s.train <- Soybean[rs>=0.33,]
+s.test <- Soybean[rs<0.33,]
 
-s.tree <- rpart(Species~., s.train)
-##############
-#7-2-10.R
-##############
-  # predicted scores and true class labels
-sctab <- data.frame(score=c(1, 1, 3, 4, 5, 5, 6, 7, 9, 9),
-                    class=factor(c(0, 0, 1, 0, 0, 1, 1 ,0, 1, 1)))
-
-  # operating point identification
-scroc <- t(sapply(c(sort(unique(sctab$score)), Inf),
-                  function(sc)
-                  {
-                    pred <- factor(as.numeric(sctab$score<sc),
-                                   levels=levels(sctab$class))
-                    list(tpr=tpr(cm <- confmat(pred, sctab$class)),
-                         fpr=fpr(cm))
-                  }))
-
-  # ROC curve
-plot(scroc, type="l", xlab="FP rate", ylab="TP rate")
-##############
-#7-2-11.R
-##############
-roc <- function(pred.s, true.y)
-{
-  cutoff <- Inf  # start with all instances classified as negative
-  tp <- fp <- 0
-  tn <- sum(2-as.integer(true.y))  # all negative instances
-  fn <- sum(as.integer(true.y)-1)  # all positive instances
-  rt <- data.frame()
-
-  sord <- order(pred.s, decreasing=TRUE)  # score ordering
-  for (i in 1:length(sord))
-  {
-    if (pred.s[sord[i]] < cutoff)
-    {
-      rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
-      cutoff <- pred.s[sord[i]]
-    }
-
-    p <- as.integer(true.y[sord[i]])-1  # next positive classified as positive
-    n <- 2-as.integer(true.y[sord[i]])  # next negative classified as positive
-    tp <- tp+p
-    fp <- fp+n
-    tn <- tn-n
-    fn <- fn-p
-  }
-  rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
-}
-s01.tree<-s.tree
-s01.test<-s.test
-prp(s01.tree, varlen=0, faclen=0)
-plotcp(s01.tree)
-plot(s01.tree, uniform=TRUE,main="Decision tree")
-pred_labels1<-predict(s01.tree, s01.test)
-#finding a name of factor level
-levels(s01.test$Species)[which.is.max(pred_labels1[1,])]
-#converting factor to the string vector
-sapply(s01.test$Species, as.character)
-#converting factor to the factor index vector
-fit1=c();for(i in 1:nrow(pred_labels1))fit1=c(fit1,which.is.max(pred_labels1[i,])); fit1
-#converting factor to index 
-#levels(s01.test$Species)<-seq_len(length(levels(s01.test$Species)))
-as.integer(s01.test$Species)
-  # ROC curve for the decision tree model
-s01.roc <- roc(fit1, s01.test$Species)
-plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
-
-  # ROC curve for a random model
-s01rand <- runif(nrow(s01.test))
-s01rand.roc <- roc(s01rand, s01.test$Species)
-lines(s01rand.roc$fpr, s01rand.roc$tpr, lty=2)
-##############
-#7-2-12.R
-##############
-## assign class labels according to the given cutoff value
-cutclass <- function(s, cutoff, labels) { factor(ustep(s, cutoff), labels=labels) }
-
-## identify the best cutoff value
-## satisfying the minimum tpr or maximum fpr constraint
-roc.shift <- function(r, min.tpr=NULL, max.fpr=NULL)
-{
-  if (!is.null(min.tpr))
-    max(r$cutoff[r$tpr>=min.tpr])
-  else if (!is.null(max.fpr))
-    min(r$cutoff[r$fpr<=max.fpr])
-  else
-    0.5
-}
-
-s01.tree<-s.tree
-s01.test<-s.test
-s01.labels<-'a'
-  # shift to achieve tpr>0.85 at minimum fpr
-s01.t085 <- roc.shift(s01.roc, min.tpr=0.85)
-s01.cm.t085 <- confmat(cutclass(predict(s01.tree, s01.test)[,2],
-                                s01.t085, s01.labels),
-                       s01.test$Species)
-  # shift to achieve maximum tpr at fpr<0.5
-s01.f05 <- roc.shift(s01.roc, max.fpr=0.5)
-s01.cm.f05 <- confmat(cutclass(predict(s01.tree, s01.test)[,2], s01.f05, s01.labels),
-                      s01.test$Species)
-  # the ROC curve
-plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
-  # the default operating point
-points(fpr(s01.cm), tpr(s01.cm), pch=8)
-  # the shifted operating points
-points(fpr(s01.cm.t085), tpr(s01.cm.t085), pch=1)
-points(fpr(s01.cm.f05), tpr(s01.cm.f05), pch=2)
-##############
-#7-2-13.R
-##############
-mixclass <- function(c1, c2, p)
-{ factor(ifelse(p<runif(length(c1)), c1, c2), labels=levels(c1)) }
-
-  # interpolate between the two shifted operating points
-s01.mix <- mixclass(cutclass(predict(s01.tree, s01.test)[,2], s01.t085, s01.labels),
-                    cutclass(predict(s01.tree, s01.test)[,2], s01.f05, s01.labels),
-                    0.75)
-s01.cmi <- confmat(s01.mix, s01.test$Class)
-
-  # the ROC curve
-plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
-  # the default operating point
-points(fpr(s01.cm), tpr(s01.cm), pch=8)
-  # the 1st shifted operating point
-points(fpr(s01.cm.t085), tpr(s01.cm.t085), pch=1)
-  # the 2nd shifted operating point
-points(fpr(s01.cm.f05), tpr(s01.cm.f05), pch=2)
-  # the interpolated operating point
-points(fpr(s01.cmi), tpr(s01.cmi), pch=5)
-##############
-#7-2-14.R
-##############
-auc <- function(roc)
-{ n <- nrow(roc); sum((roc$tpr[1:n-1]+roc$tpr[2:n])*diff(roc$fpr)/2) }
-
-  # area under the ROC curve for the decision tree model
-auc(s01.roc)
-  # area under the ROC curve for a random model
-auc(s01rand.roc)
-##############
-#7-2-15.R
-##############
-wroc <- function(pred.s, true.y, w=rep(1, length(true.y)))
-{
-  cutoff <- Inf  # start with all instances classified as negative
-  tp <- fp <- 0
-  tn <- sum((2-as.integer(true.y))*w)  # all negative instances
-  fn <- sum((as.integer(true.y)-1)*w)  # all positive instances
-  rt <- data.frame()
-
-  sord <- order(pred.s, decreasing=TRUE)  # score ordering
-  for (i in 1:length(sord))
-  {
-    if (pred.s[sord[i]] < cutoff)
-    {
-      rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
-      cutoff <- pred.s[sord[i]]
-    }
-
-    p <- (as.integer(true.y[sord[i]])-1)*w[sord[i]]  # next positive
-    n <- (2-as.integer(true.y[sord[i]]))*w[sord[i]]  # next negative
-    tp <- tp+p
-    fp <- fp+n
-    tn <- tn-n
-    fn <- fn-p
-  }
-  rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
-}
-
-  # ROC curve with double weight for the brown-spot class
-s01.w1roc <- wroc(predict(s01.tree, s01.test)[,2], s01.test$Species, s01.w1test)
-plot(s01.w1roc$fpr, s01.w1roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
-auc(s01.w1roc)
-
-  # ROC curve with 10 times less weight for instances with plant.stand=1
-s01.w2roc <- wroc(predict(s01.tree, s01.test)[,2], s01.test$Species, s01.w2test)
-lines(s01.w2roc$fpr, s01.w2roc$tpr, lty=2)
-legend("bottomright", c("brown-spot x2", "plant.stand=1 x10"), lty=1:2)
-auc(s01.w2roc)
-##############
-#7-2-16.R
-##############
-## likelihood for probabilistic classifier evaluation
-## assuming eps for 0 probabilities
-lik <- function(prob.y, true.y, eps=.Machine$double.eps)
-{
-  prod(pmax(sapply(1:length(tn <- as.numeric(true.y)),
-                   function(i) prob.y[i,tn[i]]), eps))
-}
-
-## likelihood for probabilistic binary classifier evaluation
-## assuming eps for 0 probabilities
-lik01 <- function(prob.y, true.y, eps=.Machine$double.eps)
-{
-  prod((py <- pmin(pmax(prob.y, eps), 1-eps))^(t01 <- as.num0(true.y))*(1-py)^(1-t01))
-}
-
-  # likelihood for the Soybean data
-lik(predict(s.tree, s.test), s.test$Species)
-lik(predict(s01.tree, s01.test), s01.test$Species)
-lik01(predict(s01.tree, s01.test)[,2], s01.test$Species)
-##############
-#7-2-17.R
-##############
-## loglikelihood for probabilistic classifier evaluation
-## assuming eps for 0 probabilities
-loglik <- function(prob.y, true.y, eps=.Machine$double.eps)
-{
-  sum(log(pmax(sapply(1:length(tn <- as.numeric(true.y)),
-                      function(i) prob.y[i,tn[i]]), eps)))
-}
-
-## loglikelihood for probabilistic binary classifier evaluation
-## assuming eps for 0 probabilities
-loglik01 <- function(prob.y, true.y, eps=.Machine$double.eps)
-{
-  sum((t01 <- as.num0(true.y))*log(py <- pmin(pmax(prob.y, eps), 1-eps))+
-      (1-t01)*log(1-py))
-}
-
-  # loglikelihood for the Soybean data
-loglik(predict(s.tree, s.test), s.test$Class)
-loglik(predict(s01.tree, s01.test), s01.test$Class)
-loglik01(predict(s01.tree, s01.test)[,2], s01.test$Class)
+s.tree <- rpart(Class~., s.train)
 ##############
 #7-2-1.R
 ##############
@@ -2711,11 +2494,11 @@ err(predict(s.tree, s.test, type="c"), s.test$Class)
 werr <- function(pred.y, true.y, w=rep(1, length(true.y)))
 { weighted.mean(pred.y!=true.y, w) }
 
-  # double weight for the least frequent class
+# double weight for the least frequent class
 s.w2test <- ifelse(s.test$Class=="herbicide-injury", 2, 1)
 werr(predict(s.tree, s.test, type="c"), s.test$Class, s.w2test)
 
-  # random per-class weights 1..5
+# random per-class weights 1..5
 s.wctest <- round(runif(nlevels(s.test$Class), min=1, max=5))
 s.w3test <- s.wctest[s.test$Class]
 werr(predict(s.tree, s.test, type="c"), s.test$Class, s.w3test)
@@ -2724,30 +2507,30 @@ werr(predict(s.tree, s.test, type="c"), s.test$Class, s.w3test)
 ##############
 mean.cost <- function(pred.y, true.y, rho) { mean(diag(rho[pred.y,true.y])) }
 
-  # uniform cost matrix
+# uniform cost matrix
 s.r1test <- matrix(1, nrow=nlevels(s.test$Class), ncol=nlevels(s.test$Class))
 diag(s.r1test) <- 0
 mean.cost(predict(s.tree, s.test, type="c"), s.test$Class, s.r1test)
 
-  # double cost for misclassifying the least frequent class
+# double cost for misclassifying the least frequent class
 s.r2test <- matrix(1, nrow=nlevels(s.test$Class), ncol=nlevels(s.test$Class))
 s.r2test[,levels(s.test$Class)=="herbicide-injury"] <- 2
 diag(s.r2test) <- 0
 mean.cost(predict(s.tree, s.test, type="c"), s.test$Class, s.r2test)
-  # this should give the same result
+# this should give the same result
 sum(s.w2test)/nrow(s.test)*werr(predict(s.tree, s.test, type="c"),
                                 s.test$Class, s.w2test)
 
-  # random per-class costs 1..5
+# random per-class costs 1..5
 s.r3test <- matrix(s.wctest, nrow=nlevels(s.test$Class), ncol=nlevels(s.test$Class),
                    byrow=TRUE)
 diag(s.r3test) <- 0
 mean.cost(predict(s.tree, s.test, type="c"), s.test$Class, s.r3test)
-  # this should give the same result
+# this should give the same result
 sum(s.w3test)/nrow(s.test)*werr(predict(s.tree, s.test, type="c"),
                                 s.test$Class, s.w3test)
 
-  # random costs 1..5
+# random costs 1..5
 s.r4test <- matrix(round(runif(nlevels(s.test$Class)*nlevels(s.test$Class),
                                min=1, max=5)),
                    nrow=nlevels(s.test$Class), ncol=nlevels(s.test$Class))
@@ -2760,9 +2543,9 @@ confmat <- function(pred.y, true.y)
 { table(pred.y, true.y, dnn=c("predicted", "true")) }
 
 s.cm <- confmat(predict(s.tree, s.test, type="c"), s.test$Class)
-  # error
+# error
 (sum(s.cm)-sum(diag(s.cm)))/(sum(s.cm))
-  # mean misclassification cost
+# mean misclassification cost
 sum(s.cm*s.r4test)/sum(s.cm)
 ##############
 #7-2-5.R
@@ -2814,8 +2597,8 @@ confmat01 <- function(pred.y, true.y)
                    }), levels(true.y))
 }
 
-s.cm01 <- confmat01(predict(s.tree, s.test, type="c"), s.test$Species)
-  # average TP rate, FP rate, and f-measure
+s.cm01 <- confmat01(predict(s.tree, s.test, type="c"), s.test$Class)
+# average TP rate, FP rate, and f-measure
 rowMeans(sapply(s.cm01, function(cm) c(tpr=tpr(cm), fpr=fpr(cm), fm=f.measure(cm))))
 ##############
 #7-2-9.R
@@ -2823,20 +2606,229 @@ rowMeans(sapply(s.cm01, function(cm) c(tpr=tpr(cm), fpr=fpr(cm), fm=f.measure(cm
 wconfmat <- function(pred.y, true.y, w=rep(1, length(true.y)))
 { weighted.table(pred.y, true.y, w=w, dnn=c("predicted", "true")) }
 
-  # double weight for the brown-spot class
+# double weight for the brown-spot class
 s01.w1test <- ifelse(s01.test$Class=="brown-spot", 2, 1)
 s01.w1cm <- wconfmat(predict(s01.tree, s01.test, type="c"),
                      s01.test$Class, s01.w1test)
 tpr(s01.w1cm)
 fpr(s01.w1cm)
 
-  # 10 times less weight for instances with plant.stand=1
+# 10 times less weight for instances with plant.stand=1
 s01.w2test <- ifelse(!is.na(s01.test$plant.stand) & s01.test$plant.stand=="1",
                      0.1, 1)
 s01.w2cm <- wconfmat(predict(s01.tree, s01.test, type="c"),
                      s01.test$Class, s01.w2test)
 tpr(s01.w2cm)
 fpr(s01.w2cm)
+
+##############
+#7-2-10.R
+##############
+# predicted scores and true class labels
+sctab <- data.frame(score=c(1, 1, 3, 4, 5, 5, 6, 7, 9, 9),
+                    class=factor(c(0, 0, 1, 0, 0, 1, 1 ,0, 1, 1)))
+
+# operating point identification
+scroc <- t(sapply(c(sort(unique(sctab$score)), Inf),
+                  function(sc)
+                  {
+                    pred <- factor(as.numeric(sctab$score<sc),
+                                   levels=levels(sctab$class))
+                    list(tpr=tpr(cm <- confmat(pred, sctab$class)),
+                         fpr=fpr(cm))
+                  }))
+
+# ROC curve
+plot(scroc, type="l", xlab="FP rate", ylab="TP rate")
+##############
+#7-2-11.R
+##############
+roc <- function(pred.s, true.y)
+{
+  cutoff <- Inf  # start with all instances classified as negative
+  tp <- fp <- 0
+  tn <- sum(2-as.integer(true.y))  # all negative instances
+  fn <- sum(as.integer(true.y)-1)  # all positive instances
+  rt <- data.frame()
+  
+  sord <- order(pred.s, decreasing=TRUE)  # score ordering
+  for (i in 1:length(sord))
+  {
+    if (pred.s[sord[i]] < cutoff)
+    {
+      rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+      cutoff <- pred.s[sord[i]]
+    }
+    
+    p <- as.integer(true.y[sord[i]])-1  # next positive classified as positive
+    n <- 2-as.integer(true.y[sord[i]])  # next negative classified as positive
+    tp <- tp+p
+    fp <- fp+n
+    tn <- tn-n
+    fn <- fn-p
+  }
+  rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+}
+
+# ROC curve for the decision tree model
+s01.roc <- roc(predict(s01.tree, s01.test)[,2], s01.test$Class)
+plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
+
+# ROC curve for a random model
+s01rand <- runif(nrow(s01.test))
+s01rand.roc <- roc(s01rand, s01.test$Class)
+lines(s01rand.roc$fpr, s01rand.roc$tpr, lty=2)
+##############
+#7-2-12.R
+##############
+## assign class labels according to the given cutoff value
+cutclass <- function(s, cutoff, labels) { factor(ustep(s, cutoff), labels=labels) }
+
+## identify the best cutoff value
+## satisfying the minimum tpr or maximum fpr constraint
+roc.shift <- function(r, min.tpr=NULL, max.fpr=NULL)
+{
+  if (!is.null(min.tpr))
+    max(r$cutoff[r$tpr>=min.tpr])
+  else if (!is.null(max.fpr))
+    min(r$cutoff[r$fpr<=max.fpr])
+  else
+    0.5
+}
+
+# shift to achieve tpr>0.85 at minimum fpr
+s01.t085 <- roc.shift(s01.roc, min.tpr=0.85)
+s01.cm.t085 <- confmat(cutclass(predict(s01.tree, s01.test)[,2],
+                                s01.t085, s01.labels),
+                       s01.test$Class)
+# shift to achieve maximum tpr at fpr<0.5
+s01.f05 <- roc.shift(s01.roc, max.fpr=0.5)
+s01.cm.f05 <- confmat(cutclass(predict(s01.tree, s01.test)[,2], s01.f05, s01.labels),
+                      s01.test$Class)
+# the ROC curve
+plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
+# the default operating point
+points(fpr(s01.cm), tpr(s01.cm), pch=8)
+# the shifted operating points
+points(fpr(s01.cm.t085), tpr(s01.cm.t085), pch=1)
+points(fpr(s01.cm.f05), tpr(s01.cm.f05), pch=2)
+##############
+#7-2-13.R
+##############
+mixclass <- function(c1, c2, p)
+{ factor(ifelse(p<runif(length(c1)), c1, c2), labels=levels(c1)) }
+
+# interpolate between the two shifted operating points
+s01.mix <- mixclass(cutclass(predict(s01.tree, s01.test)[,2], s01.t085, s01.labels),
+                    cutclass(predict(s01.tree, s01.test)[,2], s01.f05, s01.labels),
+                    0.75)
+s01.cmi <- confmat(s01.mix, s01.test$Class)
+
+# the ROC curve
+plot(s01.roc$fpr, s01.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
+# the default operating point
+points(fpr(s01.cm), tpr(s01.cm), pch=8)
+# the 1st shifted operating point
+points(fpr(s01.cm.t085), tpr(s01.cm.t085), pch=1)
+# the 2nd shifted operating point
+points(fpr(s01.cm.f05), tpr(s01.cm.f05), pch=2)
+# the interpolated operating point
+points(fpr(s01.cmi), tpr(s01.cmi), pch=5)
+##############
+#7-2-14.R
+##############
+auc <- function(roc)
+{ n <- nrow(roc); sum((roc$tpr[1:n-1]+roc$tpr[2:n])*diff(roc$fpr)/2) }
+
+# area under the ROC curve for the decision tree model
+auc(s01.roc)
+# area under the ROC curve for a random model
+auc(s01rand.roc)
+##############
+#7-2-15.R
+##############
+wroc <- function(pred.s, true.y, w=rep(1, length(true.y)))
+{
+  cutoff <- Inf  # start with all instances classified as negative
+  tp <- fp <- 0
+  tn <- sum((2-as.integer(true.y))*w)  # all negative instances
+  fn <- sum((as.integer(true.y)-1)*w)  # all positive instances
+  rt <- data.frame()
+  
+  sord <- order(pred.s, decreasing=TRUE)  # score ordering
+  for (i in 1:length(sord))
+  {
+    if (pred.s[sord[i]] < cutoff)
+    {
+      rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+      cutoff <- pred.s[sord[i]]
+    }
+    
+    p <- (as.integer(true.y[sord[i]])-1)*w[sord[i]]  # next positive
+    n <- (2-as.integer(true.y[sord[i]]))*w[sord[i]]  # next negative
+    tp <- tp+p
+    fp <- fp+n
+    tn <- tn-n
+    fn <- fn-p
+  }
+  rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+}
+
+# ROC curve with double weight for the brown-spot class
+s01.w1roc <- wroc(predict(s01.tree, s01.test)[,2], s01.test$Class, s01.w1test)
+plot(s01.w1roc$fpr, s01.w1roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
+auc(s01.w1roc)
+
+# ROC curve with 10 times less weight for instances with plant.stand=1
+s01.w2roc <- wroc(predict(s01.tree, s01.test)[,2], s01.test$Class, s01.w2test)
+lines(s01.w2roc$fpr, s01.w2roc$tpr, lty=2)
+legend("bottomright", c("brown-spot x2", "plant.stand=1 x10"), lty=1:2)
+auc(s01.w2roc)
+##############
+#7-2-16.R
+##############
+## likelihood for probabilistic classifier evaluation
+## assuming eps for 0 probabilities
+lik <- function(prob.y, true.y, eps=.Machine$double.eps)
+{
+  prod(pmax(sapply(1:length(tn <- as.numeric(true.y)),
+                   function(i) prob.y[i,tn[i]]), eps))
+}
+
+## likelihood for probabilistic binary classifier evaluation
+## assuming eps for 0 probabilities
+lik01 <- function(prob.y, true.y, eps=.Machine$double.eps)
+{
+  prod((py <- pmin(pmax(prob.y, eps), 1-eps))^(t01 <- as.num0(true.y))*(1-py)^(1-t01))
+}
+
+# likelihood for the Soybean data
+lik(predict(s.tree, s.test), s.test$Class)
+lik(predict(s01.tree, s01.test), s01.test$Class)
+lik01(predict(s01.tree, s01.test)[,2], s01.test$Class)
+##############
+#7-2-17.R
+##############
+## loglikelihood for probabilistic classifier evaluation
+## assuming eps for 0 probabilities
+loglik <- function(prob.y, true.y, eps=.Machine$double.eps)
+{
+  sum(log(pmax(sapply(1:length(tn <- as.numeric(true.y)),
+                      function(i) prob.y[i,tn[i]]), eps)))
+}
+
+## loglikelihood for probabilistic binary classifier evaluation
+## assuming eps for 0 probabilities
+loglik01 <- function(prob.y, true.y, eps=.Machine$double.eps)
+{
+  sum((t01 <- as.num0(true.y))*log(py <- pmin(pmax(prob.y, eps), 1-eps))+
+        (1-t01)*log(1-py))
+}
+
+# loglikelihood for the Soybean data
+loglik(predict(s.tree, s.test), s.test$Class)
+loglik(predict(s01.tree, s01.test), s01.test$Class)
+loglik01(predict(s01.tree, s01.test)[,2], s01.test$Class)
 ##############
 #7-3-1.R
 ##############
@@ -2847,7 +2839,7 @@ holdout <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
   ylabs <- levels(data[[yn]])     # class labels
   pred.y <- NULL  # predictions
   true.y <- NULL  # true class labels
-
+  
   for (t in 1:n)
   {
     r <- runif(nrow(data))
@@ -2857,24 +2849,24 @@ holdout <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
     pred.y <- c(pred.y, predf(model, test))
     true.y <- c(true.y, test[[yn]])
   }
-
+  
   if (!is.null(ylabs))
   {
     if (!prob)
       pred.y <- factor(pred.y, levels=1:length(ylabs), labels=ylabs)
     true.y <- factor(true.y, levels=1:length(ylabs), labels=ylabs)
   }
-
+  
   return(data.frame(pred=pred.y, true=true.y))
 }
 
-  # hold-out evaluation of discrete predictions
+# hold-out evaluation of discrete predictions
 s01ho <- holdout(rpart, Class~., Soybean01,
                  predf=function(...) predict(..., type="c"), n=10)
 err(s01ho$pred, s01ho$true)
 confmat(s01ho$pred, s01ho$true)
 
-  # hold-out evaluation of probabilistic predictions
+# hold-out evaluation of probabilistic predictions
 s01hop <- holdout(rpart, Class~., Soybean01,
                   predf=function(...) predict(..., type="p")[,2], prob=TRUE, n=10)
 s01hop.roc <- roc(s01hop$pred, s01hop$true)
@@ -2890,7 +2882,7 @@ crossval <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
   ylabs <- levels(data[[yn]])     # class labels
   pred.y <- NULL  # predictions
   true.y <- NULL  # true class labels
-
+  
   for (t in 1:n)
   {
     ind <- sample(k, size=nrow(data), replace=TRUE)  # index of k random subsets
@@ -2903,42 +2895,42 @@ crossval <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
       true.y <- c(true.y, test[[yn]])
     }
   }
-
+  
   if (!is.null(ylabs))
   {
     if (!prob)
       pred.y <- factor(pred.y, levels=1:length(ylabs), labels=ylabs)
     true.y <- factor(true.y, levels=1:length(ylabs), labels=ylabs)
   }
-
+  
   return(data.frame(pred=pred.y, true=true.y))
 }
 
-  # 3-fold cross-validation for discrete predictions
+# 3-fold cross-validation for discrete predictions
 s01cv3 <- crossval(rpart, Class~., Soybean01,
                    predf=function(...) predict(..., type="c"), k=3)
 err(s01cv3$pred, s01cv3$true)
 confmat(s01cv3$pred, s01cv3$true)
 
-  # 10-fold cross-validation for discrete predictions
+# 10-fold cross-validation for discrete predictions
 s01cv10 <- crossval(rpart, Class~., Soybean01,
                     predf=function(...) predict(..., type="c"), k=10)
 err(s01cv10$pred, s01cv10$true)
 confmat(s01cv10$pred, s01cv10$true)
 
-  # 20-fold cross-validation for discrete predictions
+# 20-fold cross-validation for discrete predictions
 s01cv20 <- crossval(rpart, Class~., Soybean01,
                     predf=function(...) predict(..., type="c"), k=20)
 err(s01cv20$pred, s01cv20$true)
 confmat(s01cv20$pred, s01cv20$true)
 
-  # 4x5-fold cross-validation for discrete predictions
+# 4x5-fold cross-validation for discrete predictions
 s01cv4x5 <- crossval(rpart, Class~., Soybean01,
                      predf=function(...) predict(..., type="c"), k=5, n=4)
 err(s01cv20$pred, s01cv4x5$true)
 confmat(s01cv4x5$pred, s01cv4x5$true)
 
-  # 10-fold cross-validation for probabilistic predictions
+# 10-fold cross-validation for probabilistic predictions
 s01cv10p <- crossval(rpart, Class~., Soybean01,
                      predf=function(...) predict(..., type="p")[,2], prob=TRUE, k=10)
 s01cv10p.roc <- roc(s01cv10p$pred, s01cv10p$true)
@@ -2953,7 +2945,7 @@ leave1out <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE)
   ylabs <- levels(data[[yn]])     # class labels
   pred.y <- NULL  # predictions
   true.y <- NULL  # true class labels
-
+  
   for (i in 1:nrow(data))
   {
     train <- data[-i,]
@@ -2962,24 +2954,24 @@ leave1out <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE)
     pred.y <- c(pred.y, predf(model, test))
     true.y <- c(true.y, test[[yn]])
   }
-
+  
   if (!is.null(ylabs))
   {
     if (!prob)
       pred.y <- factor(pred.y, levels=1:length(ylabs), labels=ylabs)
     true.y <- factor(true.y, levels=1:length(ylabs), labels=ylabs)
   }
-
+  
   return(data.frame(pred=pred.y, true=true.y))
 }
 
-  # leave-one-out for discrete predictions
+# leave-one-out for discrete predictions
 s01l1o <- leave1out(rpart, Class~., Soybean01,
                     predf=function(...) predict(..., type="c"))
 err(s01l1o$pred, s01l1o$true)
 confmat(s01l1o$pred, s01l1o$true)
 
-  # leave-one-out for probabilistic predictions
+# leave-one-out for probabilistic predictions
 s01l1op <- leave1out(rpart, Class~., Soybean01,
                      predf=function(...) predict(..., type="p")[,2], prob=TRUE)
 s01l1op.roc <- roc(s01l1op$pred, s01l1op$true)
@@ -2995,7 +2987,7 @@ bootstrap <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
   ylabs <- levels(data[[yn]])     # class labels
   pred.y.w <- NULL  # predictions
   true.y.w <- NULL  # true class labels
-
+  
   for (t in 1:m)
   {
     bag <- sample(nrow(data), size=nrow(data), replace=TRUE)
@@ -3005,7 +2997,7 @@ bootstrap <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
     pred.y.w <- c(pred.y.w, predf(model, test))
     true.y.w <- c(true.y.w, test[[yn]])
   }
-
+  
   if (w<1)
   {
     model <- do.call(alg, c(list(formula, data), args))
@@ -3018,35 +3010,35 @@ bootstrap <- function(alg, formula, data, args=NULL, predf=predict, prob=FALSE,
     pred.y.1w <- true.y.1w <- NULL
     w <- rep(w/m, length(pred.y.w))
   }
-
+  
   pred.y <- c(pred.y.w, pred.y.1w)
   true.y <- c(true.y.w, true.y.1w)
-
+  
   if (!is.null(ylabs))
   {
     if (!prob)
       pred.y <- factor(pred.y, levels=1:length(ylabs), labels=ylabs)
     true.y <- factor(true.y, levels=1:length(ylabs), labels=ylabs)
   }
-
+  
   return(data.frame(pred=pred.y, true=true.y, w=w))
 }
 
-  # 20x bootstrap for discrete predictions
+# 20x bootstrap for discrete predictions
 s01bs20 <- bootstrap(rpart, Class~., Soybean01,
                      predf=function(...) predict(..., type="c"), w=1, m=20)
 err(s01bs20$pred, s01bs20$true)
 confmat(s01bs20$pred, s01bs20$true)
 
-  # 20x .632 bootstrap for discrete predictions
+# 20x .632 bootstrap for discrete predictions
 s01.632bs20 <- bootstrap(rpart, Class~., Soybean01,
                          predf=function(...) predict(..., type="c"), m=20)
-  # weighted error
+# weighted error
 werr(s01.632bs20$pred, s01.632bs20$true, s01.632bs20$w)
-  # weighted confusion matrix
+# weighted confusion matrix
 wconfmat(s01.632bs20$pred, s01.632bs20$true, s01.632bs20$w)
 
-  # 20x bootstrap for probabilistic predictions
+# 20x bootstrap for probabilistic predictions
 s01bs20p <- bootstrap(rpart, Class~., Soybean01,
                       predf=function(...) predict(..., type="p")[,2], prob=TRUE,
                       w=1, m=20)
@@ -3054,11 +3046,11 @@ s01bs20p.roc <- roc(s01bs20p$pred, s01bs20p$true)
 plot(s01bs20p.roc$fpr, s01bs20p.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
 auc(s01bs20p.roc)
 
-  # 20x .632 bootstrap for probabilistic predictions
+# 20x .632 bootstrap for probabilistic predictions
 s01.632bs20p <- bootstrap(rpart, Class~., Soybean01,
                           predf=function(...) predict(..., type="p")[,2], prob=TRUE,
                           m=20)
-  # weighted ROC
+# weighted ROC
 s01.632bs20p.roc <- wroc(s01.632bs20p$pred, s01.632bs20p$true, s01.632bs20p$w)
 lines(s01.632bs20p.roc$fpr, s01.632bs20p.roc$tpr, lty=2)
 legend("bottomright", c("plain", ".632"), lty=1:2)
@@ -3077,7 +3069,7 @@ eval.bias.var <- function(alg, formula, data, args=NULL, predf=predict,
     data.avail <- data[r<p,]   # pretend this is the available dataset
     data.new <- data[r>=0.7,]  # pretend this a new dataset
     model <- do.call(alg, c(list(formula, data.avail), args))
-
+    
     cv3 <- crossval(alg, formula, data.avail, args=args, predf=predf, k=3)
     cv5 <- crossval(alg, formula, data.avail, args=args, predf=predf, k=5)
     cv10 <- crossval(alg, formula, data.avail, args=args, predf=predf, k=10)
@@ -3090,7 +3082,7 @@ eval.bias.var <- function(alg, formula, data, args=NULL, predf=predict,
     bs50 <- bootstrap(alg, formula, data.avail, args=args, predf=predf, w=1, m=50)
     bs10.632 <- bootstrap(alg, formula, data.avail, args=args, predf=predf, m=10)
     bs50.632 <- bootstrap(alg, formula, data.avail, args=args, predf=predf, m=50)
-
+    
     performance <- rbind(performance,
                          data.frame(perf(predf(model, data.new), data.new[[yn]]),
                                     perf(cv3$pred, cv3$true),
@@ -3106,20 +3098,20 @@ eval.bias.var <- function(alg, formula, data, args=NULL, predf=predict,
                                     wperf(bs10.632$pred, bs10.632$true, bs10.632$w),
                                     wperf(bs50.632$pred, bs50.632$true, bs50.632$w)))
   }
-
+  
   names(performance) <- c("true", "3-CV", "5-CV", "10-CV", "20-CV", "4x5-CV",
                           "HO", "10xHO", "L1O", "10-BS", "50-BS",
                           "10-BS.632", "50-BS.632")
   bias <- apply(performance[,-1]-performance[,1], 2, mean)
   variance <- apply(performance[,-1], 2, var)
-
+  
   list(performance=performance, bias=bias, variance=variance)
 }
 
-  # the commented lines run a 200-repetition experiment, which takes a long time
+# the commented lines run a 200-repetition experiment, which takes a long time
 #s01.ebv <- eval.bias.var(rpart, Class~., Soybean01,
 #                         predf=function(...) predict(..., type="c"), n=200)
-  # this can be used for a quick illustration
+# this can be used for a quick illustration
 s01.ebv <- eval.bias.var(rpart, Class~., Soybean01,
                          predf=function(...) predict(..., type="c"), n=10)
 

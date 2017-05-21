@@ -15,7 +15,7 @@ set.seed(12)
 
 mdata<-HouseVotes84
 
-rhv <- runif(nrow())
+rhv <- runif(nrow(mdata))
 hv.train <- mdata[rhv>=0.33,]
 hv.test <- mdata[rhv<0.33,]
 

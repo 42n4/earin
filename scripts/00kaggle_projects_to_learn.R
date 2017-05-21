@@ -1,9 +1,8 @@
-#NEW TASKS - may 2016
+#data for the 3rd project 
 https://www.kaggle.com/c/shelter-animal-outcomes/data
 https://www.kaggle.com/annavictoria/speed-dating-experiment
 https://www.kaggle.com/mylesoneill/game-of-thrones
 https://www.kaggle.com/c/titanic
-#finished projects
 https://www.kaggle.com/c/detecting-insults-in-social-commentary/data
 https://www.kaggle.com/c/random-number-grand-challenge/data
 https://www.kaggle.com/c/rossmann-store-sales/data
