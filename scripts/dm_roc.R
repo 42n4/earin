@@ -173,6 +173,8 @@ plot(scroc, type="l", xlab="FP rate", ylab="TP rate")
 ##############
 #7-2-11.R
 ##############
+pred.s<-as.vector(predict(s01.tree, s01.test)[,2])
+true.y<-s01.test$Class
 roc <- function(pred.s, true.y)
 {
   cutoff <- Inf  # start with all instances classified as negative
@@ -182,6 +184,7 @@ roc <- function(pred.s, true.y)
   rt <- data.frame()
   
   sord <- order(pred.s, decreasing=TRUE)  # score ordering
+  #pred.s[sord]
   for (i in 1:length(sord))
   {
     if (pred.s[sord[i]] < cutoff)
