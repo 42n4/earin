@@ -157,10 +157,44 @@ ci.tree.d.fmeasure <- f.measure(ci.tree.d.cm)
 #(0,0) - the classifier always predicts class 0 
 #(1,1) - the classifier always predicts class 1
 
-ci.tree.d.roc <- roc(predict(ci.tree.d, ci.val)[,2], ci.val$income)
+ci.tree.d.prob<-predict(ci.tree.d, ci.val)[,2]
+
+pred.s <- ci.tree.d.prob
+true.y <- ci.val$income
+roc <- function(pred.s, true.y)
+{
+  cutoff <- Inf  # start with all instances classified as negative
+  tp <- fp <- 0
+  tn <- sum(2-as.integer(true.y))  # all negative instances
+  fn <- sum(as.integer(true.y)-1)  # all positive instances
+  rt <- data.frame()
+  
+  sord <- order(pred.s, decreasing=TRUE)  # score ordering
+  #pred.s[sord]
+  #as.integer(true.y[sord])
+  for (i in 1:length(sord))
+  {
+    if (pred.s[sord[i]] < cutoff)
+    {
+      rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+      cutoff <- pred.s[sord[i]]
+    }
+    
+    p <- as.integer(true.y[sord[i]])-1  # next positive classified as positive
+    n <- 2-as.integer(true.y[sord[i]])  # next negative classified as positive
+    tp <- tp+p
+    fp <- fp+n
+    tn <- tn-n
+    fn <- fn-p
+  }
+  rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
+}
+
+ci.tree.d.roc <- roc(ci.tree.d.prob, ci.val$income)
 plot(ci.tree.d.roc$fpr, ci.tree.d.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
 points(ci.tree.d.fpr, ci.tree.d.tpr, pch=8)
 auc(ci.tree.d.roc)
+#dev.off() #reset graphics if you have different graphical windows
 
 #cutoff=0.5 for predict(..., type="c")
 ci.tree.d.cut06 <- ci.tree.d.roc$cutoff[ci.tree.d.roc$tpr>0.6]
@@ -169,7 +203,7 @@ ci.tree.d.cut06[1]
 #ustep in cutclass
 #ustep(ci.tree.d.prob, ci.tree.d.cut06[1])
 #default behaviour for predict(..., type="c"): ustep(ci.tree.d.prob, 0.5)
-ci.tree.d.prob<-predict(ci.tree.d, ci.val)[,2]
+
 ci.tree.d.cm06 <- confmat(cutclass(ci.tree.d.prob, ci.tree.d.cut06[1], ci.labels),
                           ci.val$income)
 ci.tree.d.tpr06 <- tpr(ci.tree.d.cm06)

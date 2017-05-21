@@ -182,10 +182,10 @@ grow.dectree.frac <- function(formula, data,
 as.data.frame.dectree.frac <- function(x, row.names=NULL, optional=FALSE, ...)
 { as.data.frame(unclass(x), row.names=row.names, optional=optional) }
 
-treem <- grow.dectree.frac(Class~., hv.train)
+treef <- grow.dectree.frac(Class~., hv.train)
 
 # data frame conversion
-as.data.frame(treem)
+as.data.frame.dectree.frac(treef)
 
 ##############
 #3-7-2.R
@@ -243,8 +243,8 @@ predict.dectree.frac <- function(tree, data)
 }
 
 # decision tree prediction for the given data with missing attribute values
-predict(treem, weatherm)
+hv.test.pred<-predict.dectree.frac(treef, hv.test)
 
-err(predict(dectree, hv.train), hv.train$Class)
+err(predict.dectree.frac(treef, hv.train), hv.train$Class)
 
-err(predict(dectree, hv.test), hv.test$Class)
+err(hv.test.pred, hv.test$Class)

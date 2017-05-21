@@ -53,6 +53,8 @@ cni.val <- predict.imp(cn.impm, cn.val)
 
 cn.tree.d <- rpart(make.formula("ViolentCrimesPerPop", cn.input.attrs), cn.train)
 r2(predict(cn.tree.d, cn.val), cn.val$ViolentCrimesPerPop)
+#r2 - coefficient of determination  
+#relates the mean square error to the target function variance
 
 # fully-grown tree
 cn.tree.f <- rpart(make.formula("ViolentCrimesPerPop", cn.input.attrs), cn.train,
