@@ -1,4 +1,3 @@
-
 ##############
 #20-3.R
 ##############
@@ -10,11 +9,12 @@ library(rpart)
 library(rpart.plot)
 library(randomForest)
 
-# read column names (extracted from the data description web page)
-commnorm.names <- read.table("../Data/commnorm.names",
+# http://archive.ics.uci.edu/ml/datasets/Communities+and+Crime+Unnormalized
+# read column names (extracted from the dataset communities.names)
+commnorm.names <- read.table("./commnorm.names",
                              stringsAsFactors=FALSE)[,1]
 # read the actual data
-commnorm <- read.table("../Data/communities.data",
+commnorm <- read.table("./communities.data",
                        sep=",", na.strings="?", col.names=commnorm.names)
 # input attribute names
 cn.input.attrs <- names(commnorm)[6:127]
@@ -89,9 +89,9 @@ cn.rf <- randomForest(make.formula("ViolentCrimesPerPop", cn.input.attrs), cni.t
                       importance=TRUE)
 r2(predict(cn.rf, cni.val[,cn.input.attrs]), cni.val$ViolentCrimesPerPop)
 
-varImpPlot(cn.rf, type=1)
+randomForest::varImpPlot(cn.rf, type=1)
 
-cn.attr.utl <- sort(importance(cn.rf)[,1], decreasing=TRUE)
+cn.attr.utl <- sort(randomForest::importance(cn.rf)[,1], decreasing=TRUE)
 cn.asets <-
   `names<-`(lapply(c(10, 25, 50, 100),
                    function(p)
@@ -141,6 +141,8 @@ cn.lm.as <-
 sapply(cn.lm.as, function(ta) ta$r2)
 
 cn.mtree <- lmrpart(make.formula("ViolentCrimesPerPop", cn.asets[["as10p"]]),
-                    cn.train, cp=0.02, skip.attr=TRUE))
+                    cn.train, cp=0.02, skip.attr=TRUE)
 
 r2(predict(cn.mtree, cni.val), cni.val$ViolentCrimesPerPop)
+
+

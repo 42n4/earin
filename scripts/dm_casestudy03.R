@@ -11,7 +11,9 @@ library(dmr.cluseval)
 library(dmr.trans)
 library(dmr.util)
 
-covtype <- read.table("../Data/covtype.data", sep=",",
+#https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/
+
+covtype <- read.table("./covtype.data", sep=",",
                       col.names=c("Elevation",
                                   "Aspect",
                                   "Slope",
