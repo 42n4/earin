@@ -5870,7 +5870,7 @@ grow.randdectree <- function(formula, data, ns=0,
                                   paste("p", clabs, sep=".")))
     cprobs <<- (ncol(tree)-length(clabs)+1):ncol(tree)  # class probability columns
     nodemap <<- rep(1, nrow(data))
-    n <<- 1
+    node <<- 1
   }
 
   next.node <- function(node)

@@ -204,7 +204,7 @@ grow.randdectree <- function(formula, data, ns=0,
                                   paste("p", clabs, sep=".")))
     cprobs <<- (ncol(tree)-length(clabs)+1):ncol(tree)  # class probability columns
     nodemap <<- rep(1, nrow(data))
-    n <<- 1
+    node <<- 1
   }
   
   next.node <- function(node)
@@ -432,8 +432,7 @@ base.ensemble.simple <- function(formula, data, m, alg, args=NULL)
 hv.bm.tree.rnd <- base.ensemble.simple(Class~., hv.train, 50, grow.randdectree)
 
 # base models for the BostonHousing data
-bh.bm.tree.rnd <- base.ensemble.simple(medv~., bh.train, 50, grow.randregtree,
-                                       args=list(minvar=5))
+bh.bm.tree.rnd <- base.ensemble.simple(medv~., bh.train, 50, grow.randregtree, args=list(minvar=5))
 
 # base model training set errors for the HouseVotes84 data
 hv.train.err.tree.rnd <- sapply(hv.bm.tree.rnd,
