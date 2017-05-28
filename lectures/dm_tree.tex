@@ -26,6 +26,7 @@
 \setmainlanguage{polish}
 \usepackage{amsmath}
 \def\bm{\boldsymbol}
+\usepackage{lualatex-math}
 \else
 \usepackage{graphicx}
 \usepackage{polski} 
@@ -44,6 +45,7 @@
 \usetikzlibrary{graphdrawing}
 \usetikzlibrary{graphs}
 \usegdlibrary{trees}
+\usepackage{pgfplots}
 
 \newcommand{\mycircle}[1]{\tikz{\filldraw[draw=#1,fill=#1] (0,0) circle [radius=0.3em];}}
 
@@ -92,10 +94,14 @@ Institute of Computer Science\\
 %\lstset{backgroundcolor=\color{brown}}
 %\lstset{linewidth=90mm}
 %\lstset{frameround=tttt}
-\lstset{frameround=trbl}
-\lstset{keywordstyle=\color{black}\bfseries}
-\lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
+%\lstset{frameround=trbl}
+%\lstset{keywordstyle=\color{black}\bfseries}
+%\lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
 %\lstset{commentstyle=\textit}
+
+\newcommand{\listingsfont}{\ttfamily}
+
+
 
 \begin{frame}
 \titlepage
@@ -397,6 +403,154 @@ $E_{c,c_1}(T)=-\frac{1}{2}\log_2(\frac{1}{2})-\frac{1}{2}\log_2(\frac{1}{2})=1$
 \end{itemize}
 \end{block}
 \end{frame}
+
+\begin{frame}
+\small
+\frametitle{Confusion Matrix}
+\begin{block}{Positives and Negatives}
+\begin{itemize}
+\item[\ ] 
+rci <- runif(nrow(census))
+\item[\ ] 
+ci.train <- census[rci>=0.33,]
+\item[\ ] 
+ci.val <- census[rci<0.33,]
+\item[\ ] 
+ci.tree.d <- rpart(income~., ci.train)
+\item[\ ] 
+ci.tree.d.pred <- predict(ci.tree.d, ci.val, type="c")
+\item[\ ] 
+ci.tree.d.cm <- confmat(ci.tree.d.pred, ci.val\$income)
+\item[\ ] 
+\begin{center}
+{\sf
+   \begin{tabular}{|c||c|c|}
+   \hline 
+    & true 0 & true 1 \\
+   \hline
+   \hline
+    pred 0 & True Negative & False Negative (II error) \\
+     & TN & FN \\
+   \hline
+    pred 1 & False Positive (I error) & True Positive \\
+    & FP & TP \\
+   \hline
+   \end{tabular}
+}
+\end{center}
+\item[\ ] FN is much worse than FP e.g. not knowing about cancer is much worse than to be informed that cancer is detected and it is not really present
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Confusion Matrix}
+\begin{block}{Performance measures}
+\begin{itemize}
+\item
+$\frac{FP+FN}{TP+TN+FP+FN}$
+misclassification error
+\item
+$\frac{TP+TN}{TP+TN+FP+FN}$
+accuracy
+\item
+$\frac{TP}{TP+FN}$
+true positive rate {recall, sensitivity} -
+the ratio of correctly classified as positive to all positive
+\item
+$\frac{FP}{TN+FP}$
+false positive rate -
+the ratio of incorrectly classified as positive to all negative
+\item
+$\frac{TP}{TP+FP}$
+precision -
+the ratio of correctly classified as positive to all instances classified as positive 
+\item
+$\frac{TN}{TN+FP}$
+specificity {1 - fpr} -
+the ratio of correctly classified as negatives to all negative instances 
+\item
+Complementary pairs for detecting e.g. trivial classifiers which predicts only one class:
+\begin{itemize}
+\item
+tpr - fpr
+\item
+precision - recall
+\item
+sensitivity - specificity
+\end{itemize}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Confusion Matrix}
+\begin{block}{Harmonic mean as a compromise between maximizing precision and recall}
+\begin{itemize}
+\item F-measure = $\frac{1}{\frac{\frac{1}{precision}+\frac{1}{recall}}{2}}$
+\item Code in R: function(cm) { 1/mean(c(1/precision(cm), 1/recall(cm))) }
+\end{itemize}
+\end{block}
+\begin{block}{Handling more than two classes}
+\begin{itemize}
+\item $1-vs-1$ one class is positive and another one is negative
+\item $1-vs-rest$ one class is positive the remaining classes are negative: confmat01 - function in R
+\item[\ ]
+cm.multi<-confmat01(ci.tree.d.pred.multi, ci.val\$multiclass)
+\item[\ ]
+rowMeans(sapply(cm.multi,function(cm) c(tpr=tpr(cm), fpr=fpr(cm), fm=f.measure(cm))))
+\end{itemize}
+\end{block}
+\begin{block}{Weighted confusion matrix}
+\begin{itemize}
+\item For instances with weights: wconfmat
+\item tpr and fpr are the same for weighted and unweighted matrices if the same weights are assigned to one class instances.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{Receiver operating characteristics (ROC)}
+\begin{block}{}
+\begin{itemize}
+\item
+In order to obtain ROC characteristics it is a need for the classifier label output with probabilities of positive class 1, if you have a label domain with two values: 0 and 1.  
+\item[\ ]
+\begin{tikzpicture}
+\begin{axis}[xlabel=fpr,ylabel=tpr,xmax=1,ymax=1,samples=50]
+  \addplot[blue, ultra thick] coordinates {(0,0) (0,1)};
+  \addlegendentry{All instances correctly labeled}
+  \addplot[blue, ultra thick] coordinates {(0,1) (1,1)};
+  \addlegendentry{Ideal ROC}
+  \addplot[red,  ultra thick][domain=0:1] (x,x);
+  \addlegendentry{Random model regression line}
+\end{axis}
+\end{tikzpicture}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{ROC features}
+\begin{block}{}
+\begin{itemize}
+\item 
+All operating points should be above the red line: tpr should be higher than fpr or in the ideal case the only operating point should be (0,1) - the blue line.
+\item 
+(1,0) - the worst operating point, (1,1) - the classifier always predicts class 1, (0,0) - the classifier always predicts class 0
+\item 
+The output probabilities for the positive class are sorted to make a ROC curve.
+\item
+For each value of probability treated as a threshold for being the positive class (above the threshold) or the negative class (below the threshold) starting from the highest probability the all TP and FP are counted resulting in tpr and fpr rates, which give operating points and finally after joining them with lines - ROC curve.
+\item
+The default optimal operating point is for the threshold equal to 0.5, but it is often not the best point.
+\item
+Moving along the ROC curve shifting the operating point is possible by changing the threshold.
+\end{itemize}
+\end{block}
+\end{frame}
+
 
 % End of slides
 \end{document} 
