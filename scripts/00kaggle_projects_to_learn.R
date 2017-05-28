@@ -1,4 +1,4 @@
-The third project:
+The data mining project:
 1) Your third project task is to choose data from my kaggle.com project list:
 https://github.com/pwasiewi/dokerz/blob/master/rstudio/00kaggle_projects_to_learn.R
 (I have selected just smaller sets – maybe not all links work or not all sets are suitable for case studies) or http://archive.ics.uci.edu/ml/datasets.html and make a case study.
@@ -9,11 +9,11 @@ c) I proposed some datasets, but you should choose the appriopriate one for your
 https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy01.R
 https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy02.R
 https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy03.R
-3) You should provide a (short - max 2-3 pages) documentation file containing: 
-a) the description of columns e.g. the number of discrete and continuous ones (make factors from discrete ones).
-b) the description of used classification methods and their validation process (changing their parameters, adding cost matrices to them,  modifing input data e.g. standardization (standard score), normalization, removing NA and so on).zlib1g-dev
+3) You should provide a (short - max 2-3 pages) documentation file to my email containing: 
+a) the description of attributes (columns) e.g. the number of discrete and continuous attributes (make factors from discrete ones, get rid of useless ones or remove one attribute from each pair of strongly correlated attributes).
+b) the description of used classification methods and their validation process (changing their parameters, adding cost matrices to them,  modifing input data e.g. standardization (standard score), normalization, removing NA and so on).
 c) the validation process summary including ROC plots and their comparison.
-d) You can use some clustering methods for not labeled datasets (without an obvious target attribute). After this operation you can learn classifiers utilising input data and  cluster labels.
+d) You can use some clustering methods for not labeled datasets (without an obvious target attribute). After this operation you can learn classifiers utilising input data and obtained cluster labels.
 e) Enclose please your R code with comments
 4) All projects should be done individually and may be done in pairs on that condition that you divide your work into two parts belonging to individual persons, but each person should make some classifier validations.
 5) The suggested language is R (ask for permission to use another programming language such as python).
@@ -21,9 +21,10 @@ e) Enclose please your R code with comments
 https://github.com/pwasiewi/earin
 https://github.com/pwasiewi/dokerz/tree/master/rstudio
 The latter site has instructions to run a docker with all needed libraries for three lecture case studies.  
-7) My office hours on Fridays at 2 o’clock pm in room 22. Just email me and I will help you to choose your dataset, if you have doubts or just to make further research.
+7) My office hours on Fridays at 2 o’clock pm in room 22. Just email me and I will help you to choose your dataset, if you have some doubts or just to make further research.
+My email: pwasiewi@elka.pw.edu.pl
 
-#data for the 3rd project 
+#Datasets for the 3rd project (send me your choice - several alternatives - by email) 
 https://www.kaggle.com/c/shelter-animal-outcomes/data
 https://www.kaggle.com/annavictoria/speed-dating-experiment
 https://www.kaggle.com/mylesoneill/game-of-thrones

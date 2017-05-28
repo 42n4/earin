@@ -1,3 +1,8 @@
+################
+#All examples from the Cichosz book "Data mining: explained in R"
+#temporary errors after update of docker 42n4/rstudio to R-3.4.0 and debian sid 
+#in 6.3.3-6.?
+
 pkglist<-c('devtools','remotes','e1071','rpart','rpart.plot','lattice','ipred','cluster','quadprog',
            'kernlab','Matrix','randomForest','nnet')
 dmrpkglist<-c('dmr.data','dmr.util','dmr.util','dmr.claseval','dmr.stats',
@@ -27,6 +32,7 @@ pkgcheck <- pkglist %in% row.names(installed.packages())
 #packages still not installed
 paste(pkglist[!pkgcheck],collapse=' ')
 for(i in pkglist){ library(i, character.only = TRUE);}
+
 ##############
 #2-1-1.R
 ##############
@@ -1774,7 +1780,7 @@ pid.gdl.lt <- gradient.descent(diabetes~., pid.train, w=rep(0, ncol(pid.train)),
                                grad=grad.logit(repf.linear, grad.linear),
                                delta=delta.loglik,
                                perf=function(p, y) -loglik01(p, y),
-                               beta=1e-7, batch=TRUE, eps=250, niter=1e6)
+                               beta=1e-7, batch=TRUE, eps=250, niter=10000)# niter=1e6 changed
 
   # training set error
 err(predict(gdl.th$model, lcdat.train[,1:4]), lcdat.train$c)
@@ -2166,7 +2172,7 @@ confmat(naiveBayes.m$predict(v01.nb.m, v01.test), v01.test$Class)
 #6-3-4.R
 ##############
 ## generate an instance-relabeling cost-sensitive wrapper
-mc.relabel <- function(alg, palg=alg, pargs=NULL, predf=predict, ppredf=predict)
+mc.relabel <- function(alg, palg, pargs=NULL, predf=predict, ppredf=predict)
 {
   wrapped.alg <- function(formula, data, rho, ...)
   {
@@ -2181,11 +2187,11 @@ mc.relabel <- function(alg, palg=alg, pargs=NULL, predf=predict, ppredf=predict)
 }
 
   # relabeling wrapper around rpart
-rpart.l <- mc.relabel(rpart, pargs=list(cp=0.025),
+rpart.l <- mc.relabel(rpart,rpart, pargs=list(cp=0.025),
                       predf=function(...) predict(..., type="c"))
 
   # relabeling wrapper around rpart using bagging for probability estimation
-rpart.bagg.l <- mc.relabel(rpart, bagging,
+rpart.bagg.l <- mc.relabel(rpart,bagging,
                            pargs=list(control=rpart.control(cp=0.025)),
                            predf=function(...) predict(..., type="c"),
                            ppredf=function(...) predict(..., type="p",
@@ -3256,7 +3262,7 @@ gd1 <- gradient.descent(f1~a1+a2+a3+a4, lrdat.train, w=rep(0, 5),
   # linear model for the Boston Housing data
 bh.gd <- gradient.descent(medv~., bh.train, w=rep(0, ncol(bh.train)),
                           repf=repf.linear, grad=grad.linear, beta=1e-6, eps=25,
-                          niter=5000)
+                          niter=500) #it was niter=5000
 
   # test set error
 mse(predict(gd1$model, lrdat.test[,1:4]), lrdat.test$f1)
@@ -4567,7 +4573,7 @@ table(predict(g.kmedians, g.std.test[,-10]), g.std.test$Type)
   # attribute distribution within clusters for the Iris data
 par(mfrow=c(2, 2))
 for (attr in names(i.std.train)[1:4])
-  boxplot(i.std.train[[attr]]~i.kmedoids$clustering, main=attr)
+  boxplot(i.std.train[[attr]]~i.kmedians$clustering, main=attr)
 ##############
 #12-4-2.R
 ##############
