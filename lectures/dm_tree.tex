@@ -227,7 +227,7 @@ A hierarchical structure representing dataset/domain partitioning nodes: splits 
 \item
 \justifying
 The dataset $T$ has three input attributes $a,b,c$ and target class labels $C$ and a nodemap $S$ - current tree terminal node indices which are attached the given instances to.
-At the beginning of creating (growing) the tree we have only one node with a number 1 and it is a root and a temporary leaf simultaneously, so the nodemap has only one node.
+At the beginning of creating (growing) the tree we have only one node with a number 1 and it is a root and also a temporary leaf, so the nodemap has only one node.
 
 \begin{center}
 \begin{tikzpicture}
@@ -321,7 +321,7 @@ $E_{a,a_2}(T)=
 \begin{itemize}
 \item
 \justifying
-Based on the chosen split condition $a(x)=a_2$ the new nodemap is generated. The instances with the following value attributes $a(x)=a_2$ belong to the branch of the node 2 and as it was earlier mentioned the node 2 becomes the tree leaf (a terminal node with one class value) and the rest of instances belongs to the node 3. Thus, not necessary all target classes in the branch subsets should be equal to 1, sometimes the majority of the same instances class values above the given threshold is the admisible criterion for creating leaves. 
+Based on the chosen split condition $a(x)=a_2$ the new nodemap is generated. The instances with the following value attributes $a(x)=a_2$ belong to the branch of the node 2 and as it was earlier mentioned the node 2 becomes the tree leaf (a terminal node with one class value) and the rest of instances belongs to the node 3. Thus, it is not necessary that all target classes in the branch subsets should be equal only to one class, sometimes the majority of the instances with the same class above the given threshold is the admisible criterion for creating leaves. 
 \item
 \begin{center}
 {\sf
@@ -355,9 +355,9 @@ Based on the chosen split condition $a(x)=a_2$ the new nodemap is generated. The
 \justifying
 In the next steps for every next node instance subset the split with the smallest entropy equal to 0 or as close as possible to 0 is also chosen. 
 \item
-But for the node 2 instances denoted in the nodemap the stop criterion is met and it can become a leaf which accurately classifies the attached test dataset instances and hopefully will achieve good accuracy for new similar instances chosen by the condition $a(x)=a_2$ (there will be a few false positives).
+But for the node 2 instances denoted in the nodemap the stop criterion is met and it can become a leaf which accurately classifies the attached test dataset instances and hopefully will achieve good accuracy for new similar instances chosen by the condition $a(x)=a_2$.
 \item 
-For the node 3 branch instance subset the attribute $b$ values are appriopriate: for each target class it has different values. It creates two nodes with binary tree child nodes numbering $2n=6$ and $2n+1=7$.
+For the node 3 instance subset the attribute $b$ values are appriopriate: for each target class it has different values with entropy equal to 0. It creates two binary child nodes numbered $2n=6$ and $2n+1=7$ (only for binary trees).
 
 $E_{b,b_1}(T)= 
 -\frac{|T^{0}_{b,b_1}|}{|T_{b,b_1}|}\log_2(\frac{|T^{0}_{b,b_1}|}{|T_{b,b_1}|}) 
@@ -542,11 +542,11 @@ All operating points should be above the red line: tpr should be higher than fpr
 \item 
 The output probabilities for the positive class are sorted to make a ROC curve.
 \item
-For each value of probability treated as a threshold for being the positive class (above the threshold) or the negative class (below the threshold) starting from the highest probability the all TP and FP are counted resulting in tpr and fpr rates, which give operating points and finally after joining them with lines - ROC curve.
+For each value of probability treated as a threshold for being the positive class (above the threshold) or the negative class (below the threshold) starting from the highest probability the all TP and FP are counted resulting in tpr and fpr rates, which give operating points and finally after joining them with lines - the ROC curve.
 \item
 The default optimal operating point is for the threshold equal to 0.5, but it is often not the best point.
 \item
-Moving along the ROC curve shifting the operating point is possible by changing the threshold.
+Moving along the ROC curve shifting the operating point is possible by changing the mentioned threshold.
 \end{itemize}
 \end{block}
 \end{frame}

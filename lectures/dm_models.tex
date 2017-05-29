@@ -74,7 +74,7 @@ Institute of Computer Science\\
 %\lstset{linewidth=90mm}
 %\lstset{frameround=tttt}
 \lstset{frameround=trbl}
-\lstset{keywordstyle=\color{black}\bfseries\small}
+\lstset{keywordstyle=\color{black}\bfseries}
 \lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
 %\lstset{commentstyle=\textit}
 
@@ -91,14 +91,16 @@ Institute of Computer Science\\
 \end{block}
 \begin{block}{Internet sites}
 \begin{itemize}
+\item https://github.com/pwasiewi/earin
+\item https://github.com/pwasiewi/dokerz/tree/master/rstudio
 \item http://www.wiley.com/go/data\_mining\_algorithms
 \item http://www.stat.wisc.edu/$\tilde{\ }$larget/stat302/chap3.pdf
+\item http://www.wekaleamstudios.co.uk/supplementary-material/
 \end{itemize}
 \end{block}
 \end{frame}
 
 \begin{frame}
-\small
 \frametitle{Data Sets}
 \begin{block}{Tables}
 \begin{itemize}
@@ -109,17 +111,14 @@ Institute of Computer Science\\
 \item The target attribute classifies instances (objects) into classes or clusters them into groups.
 \end{itemize}
 \end{block}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Data Sets}
-\begin{block}{Baskets}
+\scriptsize
+\begin{block}{}
 \begin{itemize}
 \item Baskets consists e.g. of different length sets of product ids (ordinal numbers).
 \end{itemize}
 \end{block}
 \end{frame}
+
 
 \begin{frame}
 \footnotesize 
@@ -244,6 +243,40 @@ Institute of Computer Science\\
 \end{block}
 \end{frame}
 
+\begin{frame}
+\small
+\frametitle{Case study}
+\begin{block}{Data preparation}
+\begin{itemize}
+\item Attributes not related to the class target have to be removed.
+\item Attributes with too many missing values (NA) may be removed or go through imputation - filling missing values with means or medians for continuous attributes or with modes (most frequent values) for discrete ones.
+\item Attributes with many outliers may be removed or another way is to get rid of these outliers or to use median.
+\item For some algorithms attributes can be standardized $(x-mean)/sd$ or/and normalized $(x - min)/(max -min)$ .
+\item Attributes strongly correlated should be removed except the best one e.g. with less missing values (NA) or with a fewer outliers.
+\item Attributes with too many discrete values can aggregate them to max number of 32 (it is suitable for many random forest algorithms).
+\item The given dataset is divided into three sets: training, validating and testing data. 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Case study}
+\begin{block}{Training phase}
+\begin{itemize}
+\item Training of your model based on the training dataset.
+\end{itemize}
+\end{block}
+\begin{block}{Validation phase}
+\begin{itemize}
+\item Estimation how well your model is trained and how to find model best properties, training algorithm parameters.
+\end{itemize}
+\end{block}
+\begin{block}{Testing phase}
+\begin{itemize}
+\item At the end of the process checking quality of the trained and validated model using the testing dataset.
+\end{itemize}
+\end{block}
+\end{frame}
 % End of slides
 \end{document} 
 

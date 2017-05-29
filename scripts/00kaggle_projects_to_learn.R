@@ -13,7 +13,7 @@ https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy03.R
 a) the description of attributes (columns) e.g. the number of discrete and continuous attributes (make factors from discrete ones, get rid of useless ones or remove one attribute from each pair of strongly correlated attributes).
 b) the description of used classification methods and their validation process (changing their parameters, adding cost matrices to them,  modifing input data e.g. standardization (standard score), normalization, removing NA and so on).
 c) the validation process summary including ROC plots and their comparison.
-d) You can use some clustering methods for not labeled datasets (without an obvious target attribute). After this operation you can learn classifiers utilising input data and obtained cluster labels.
+d) You may use some clustering methods for not labeled datasets (without an obvious target attribute). After this operation you can learn classifiers utilising input data and obtained cluster labels.
 e) Enclose please your R code with comments
 4) All projects should be done individually and may be done in pairs on that condition that you divide your work into two parts belonging to individual persons, but each person should make some classifier validations.
 5) The suggested language is R (ask for permission to use another programming language such as python).
