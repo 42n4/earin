@@ -203,7 +203,7 @@ A hierarchical structure representing dataset/domain partitioning nodes: splits 
 \frametitle{Growing the exemplary decision tree}
 \begin{block}{An exemplary test dataset $T$}
 \begin{itemize}
-\item
+\item[\ ]
 \begin{center}
 {\sf
    \begin{tabular}{|p{3mm}||c|c||c||c|}
@@ -249,8 +249,7 @@ $E_{a,a_1}(T)=
 -\frac{|T^{0}_{a,a_1}|}{|T_{a,a_1}|}\log_2(\frac{|T^{0}_{a,a_1}|}{|T_{a,a_1}|}) 
 -\frac{|T^{1}_{a,a_1}|}{|T_{a,a_1}|}\log_2(\frac{|T^{1}_{a,a_1}|}{|T_{a,a_1}|}) =
 -\frac{1}{2}\log_2(\frac{1}{2})-\frac{1}{2}\log_2(\frac{1}{2})=1$
-\item 
-\item
+\item[\ ]
 \begin{center}
 {\sf
    \begin{tabular}{|p{3mm}||c|c||c||c|}
@@ -287,7 +286,7 @@ $E_{a,a_2}(T)=
 -\frac{|T^{0}_{a,a_2}|}{|T_{a,a_2}|}\log_2(\frac{|T^{0}_{a,a_2}|}{|T_{a,a_2}|}) 
 -\frac{|T^{1}_{a,a_2}|}{|T_{a,a_2}|}\log_2(\frac{|T^{1}_{a,a_2}|}{|T_{a,a_2}|}) =
 -\frac{0}{3}\log_2(\frac{0}{3})-\frac{3}{3}\log_2(\frac{3}{3})=0$
-\item
+\item[\ ]
 \begin{minipage}[t]{.45\textwidth}
 \begin{tikzpicture}[>=stealth, every node/.style={circle, draw, minimum size=0.75cm}]
 \graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
@@ -322,7 +321,7 @@ $E_{a,a_2}(T)=
 \item
 \justifying
 Based on the chosen split condition $a(x)=a_2$ the new nodemap is generated. The instances with the following value attributes $a(x)=a_2$ belong to the branch of the node 2 and as it was earlier mentioned the node 2 becomes the tree leaf (a terminal node with one class value) and the rest of instances belongs to the node 3. Thus, it is not necessary that all target classes in the branch subsets should be equal only to one class, sometimes the majority of the instances with the same class above the given threshold is the admisible criterion for creating leaves. 
-\item
+\item[\ ]
 \begin{center}
 {\sf
    \begin{tabular}{|p{3mm}||c|c||c||c|}
