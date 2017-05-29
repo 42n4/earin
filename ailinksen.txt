@@ -5,7 +5,7 @@
 ### EARIN materials
  - https://github.com/pwasiewi/earin
  - https://github.com/pwasiewi/dokerz/tree/master/rstudio
- - [https://www.svm-tutorial.com/2014/10/support-vector-regression-r](The site with R tutorials for regression and svm (a free ebook about svm!)
+ - [https://www.svm-tutorial.com/2014/10/support-vector-regression-r](The site with R tutorials for regression and svm - a free ebook about svm!)
  - [https://www.r-bloggers.com/learning-kernels-svm](Visualization of the svm square kernel transformation)
  - [http://www.wekaleamstudios.co.uk/supplementary-material](R leaflets)
  - [https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf](Short intro to the classifier library wrapper caret)
