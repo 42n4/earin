@@ -5,7 +5,6 @@
 ### EARIN materials
  - https://github.com/pwasiewi/earin
  - https://github.com/pwasiewi/dokerz/tree/master/rstudio
-<<<<<<< HEAD
  - [The site with R tutorials for regression and svm [a free ebook about svm!](https://www.svm-tutorial.com/2014/10/support-vector-regression-r/)
  - [Visualization of the svm square kernel transformation](https://www.r-bloggers.com/learning-kernels-svm/)
  - [R leaflets](http://www.wekaleamstudios.co.uk/supplementary-material/)
@@ -16,7 +15,6 @@
  - [Extremely interesting video tutorial about the classifier library wrapper caret](https://www.youtube.com/watch?v=7Jbb2ItbTC4)
 
 ### Linear regression, gradient descent optimization tutorial [EARIN]
-=======
  - [https://www.svm-tutorial.com/2014/10/support-vector-regression-r](The site with R tutorials for regression and svm - a free ebook about svm!)
  - [https://www.r-bloggers.com/learning-kernels-svm](Visualization of the svm square kernel transformation)
  - [http://www.wekaleamstudios.co.uk/supplementary-material](R leaflets)
@@ -26,8 +24,7 @@
  - [https://www.coursera.org/learn/practical-machine-learning/lecture/Bu9ns/caret-package](Coursera video tutorial about the classifier library wrapper caret)
  - [https://www.youtube.com/watch?v=7Jbb2ItbTC4](Extremely interesting video tutorial about the classifier library wrapper caret)
 
-### Linear regression, gradient descent optimization tutorial (EARIN)
->>>>>>> 686c0d4f192b7c88f134219486d13cd5101d4e9d
+### Linear regression, gradient descent optimization tutorial [EARIN]
  - https://github.com/pwasiewi/earin/blob/master/scripts/02regrfirsten.R
  
 ### Data mining projects for studying (in R, Python)
