@@ -1,8 +1,8 @@
 ################
 #All examples from the Cichosz book "Data mining: explained in R"
 #temporary errors after update of docker 42n4/rstudio to R-3.4.0 and debian sid 
-#in 6.3.3-6.?
-
+#in 6.3.4-6.* line 2172
+#in 19-4-7
 pkglist<-c('devtools','remotes','e1071','rpart','rpart.plot','lattice','ipred','cluster','quadprog',
            'kernlab','Matrix','randomForest','nnet')
 dmrpkglist<-c('dmr.data','dmr.util','dmr.util','dmr.claseval','dmr.stats',
@@ -9770,13 +9770,14 @@ library(rpart)
 library(rpart.plot)
 library(randomForest)
 
-  # read column names (extracted from the data description web page)
-commnorm.names <- read.table("../Data/commnorm.names",
+# http://archive.ics.uci.edu/ml/datasets/Communities+and+Crime+Unnormalized
+# read column names (extracted from the dataset communities.names)
+commnorm.names <- read.table("./commnorm.names",
                              stringsAsFactors=FALSE)[,1]
-  # read the actual data
-commnorm <- read.table("../Data/communities.data",
+# read the actual data
+commnorm <- read.table("./communities.data",
                        sep=",", na.strings="?", col.names=commnorm.names)
-  # input attribute names
+# input attribute names
 cn.input.attrs <- names(commnorm)[6:127]
 
 set.seed(12)
@@ -9788,22 +9789,22 @@ cn.val <- commnorm[rcn<0.33,]
 sum(complete.cases(cn.train))/nrow(cn.train)
 sum(complete.cases(cn.val))/nrow(cn.val)
 
-  # attributes with many (>50%) missing values
+# attributes with many (>50%) missing values
 cn.input.attrs.miss <-
   names(which(sapply(cn.input.attrs,
                      function(a)
-                     sum(is.na(cn.train[a]))/nrow(cn.train))>0.5))
+                       sum(is.na(cn.train[a]))/nrow(cn.train))>0.5))
 
-  # attributes with many (>10%) outliers
+# attributes with many (>10%) outliers
 cn.input.attrs.out <-
   names(which(sapply(cn.input.attrs,
                      function(a)
-                     length(boxplot(cn.train[a], range=2, plot=FALSE)$out)/
-                     nrow(cn.train))>0.1))
+                       length(boxplot(cn.train[a], range=2, plot=FALSE)$out)/
+                       nrow(cn.train))>0.1))
 
 cn.input.attrs.cor <- cor(cn.train[,cn.input.attrs], use="pairwise.complete.obs")
 cn.input.attrs.corind <- which(upper.tri(cn.input.attrs.cor) &
-                               abs(cn.input.attrs.cor)>0.98, arr.ind=TRUE)
+                                 abs(cn.input.attrs.cor)>0.98, arr.ind=TRUE)
 cn.input.attrs.corpairs <- data.frame(a1=cn.input.attrs[cn.input.attrs.corind[,1]],
                                       a2=cn.input.attrs[cn.input.attrs.corind[,2]])
 
@@ -9813,19 +9814,21 @@ cni.val <- predict.imp(cn.impm, cn.val)
 
 cn.tree.d <- rpart(make.formula("ViolentCrimesPerPop", cn.input.attrs), cn.train)
 r2(predict(cn.tree.d, cn.val), cn.val$ViolentCrimesPerPop)
+#r2 - coefficient of determination  
+#relates the mean square error to the target function variance
 
-  # fully-grown tree
+# fully-grown tree
 cn.tree.f <- rpart(make.formula("ViolentCrimesPerPop", cn.input.attrs), cn.train,
                    minsplit=2, cp=0)
 r2(predict(cn.tree.f, cn.val), cn.val$ViolentCrimesPerPop)
-  # minimum-error cost-complexity pruning
+# minimum-error cost-complexity pruning
 cn.tree.pmin <- prune(cn.tree.f, cpmin(cn.tree.f$cptable))
 r2(predict(cn.tree.pmin, cn.val), cn.val$ViolentCrimesPerPop)
-  # 1-sd cost-complexity pruning
+# 1-sd cost-complexity pruning
 cn.tree.p1sd <- prune(cn.tree.f, cp1sd(cn.tree.f$cptable))
 r2(predict(cn.tree.p1sd, cn.val), cn.val$ViolentCrimesPerPop)
 
-  # 10x10-fold cross-validated R2 values for the most promising cp sequence
+# 10x10-fold cross-validated R2 values for the most promising cp sequence
 cn.cp.cv <-
   sapply(unname(cpminrange(cn.tree.f$cptable, 5, 10)),
          function(cp)
@@ -9849,23 +9852,23 @@ cn.rf <- randomForest(make.formula("ViolentCrimesPerPop", cn.input.attrs), cni.t
                       importance=TRUE)
 r2(predict(cn.rf, cni.val[,cn.input.attrs]), cni.val$ViolentCrimesPerPop)
 
-varImpPlot(cn.rf, type=1)
+randomForest::varImpPlot(cn.rf, type=1)
 
-cn.attr.utl <- sort(importance(cn.rf)[,1], decreasing=TRUE)
+cn.attr.utl <- sort(randomForest::importance(cn.rf)[,1], decreasing=TRUE)
 cn.asets <-
   `names<-`(lapply(c(10, 25, 50, 100),
                    function(p)
-                   names(cn.attr.utl)[1:round(p*length(cn.attr.utl)/100)]),
+                     names(cn.attr.utl)[1:round(p*length(cn.attr.utl)/100)]),
             paste("as", c(10, 25, 50, 100), "p", sep=""))
 
 cn.attr.cor <- sort(abs(cor(cn.train[,cn.input.attrs], cn.train$ViolentCrimesPerPop,
-                         method="spearman", use="pairwise.complete.obs")[,1]),
-                 decreasing=TRUE)
+                            method="spearman", use="pairwise.complete.obs")[,1]),
+                    decreasing=TRUE)
 cn.asets <- c(cn.asets,
               `names<-`(lapply(c(10, 25, 50, 100),
-                     function(p)
-                     names(cn.attr.cor)[1:round(p*length(cn.attr.cor)/100)]),
-              paste("as", c(10, 25, 50, 100), "p.cor", sep="")))
+                               function(p)
+                                 names(cn.attr.cor)[1:round(p*length(cn.attr.cor)/100)]),
+                        paste("as", c(10, 25, 50, 100), "p.cor", sep="")))
 
 cn.tree.as <-
   lapply(cn.asets,
@@ -9901,9 +9904,11 @@ cn.lm.as <-
 sapply(cn.lm.as, function(ta) ta$r2)
 
 cn.mtree <- lmrpart(make.formula("ViolentCrimesPerPop", cn.asets[["as10p"]]),
-                    cn.train, cp=0.02, skip.attr=TRUE))
+                    cn.train, cp=0.02, skip.attr=TRUE)
 
 r2(predict(cn.mtree, cni.val), cni.val$ViolentCrimesPerPop)
+
+
 ##############
 #20-4.R
 ##############
@@ -9917,7 +9922,9 @@ library(dmr.cluseval)
 library(dmr.trans)
 library(dmr.util)
 
-covtype <- read.table("../Data/covtype.data", sep=",",
+#https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/
+
+covtype <- read.table("./covtype.data", sep=",",
                       col.names=c("Elevation",
                                   "Aspect",
                                   "Slope",
@@ -9987,7 +9994,7 @@ c(default=nrow(ct.tree.d$frame), full=nrow(ct.tree.f$frame),
 
 ct.tree.w <- rpart(Cover.Type~., ct.train, xval=0,
                    parms=list(prior=rep(1/nlevels(ct.train$Cover.Type),
-                                         nlevels(ct.train$Cover.Type))))
+                                        nlevels(ct.train$Cover.Type))))
 
 ct.tree.w.pred <- predict(ct.tree.w, ct.val, type="c")
 ct.tree.w.cm01 <- confmat01(ct.tree.w.pred, ct.val$Cover.Type)
@@ -10089,8 +10096,8 @@ ctn.test <- predict.nrm(ct.nrmm, ct.test)
 
 ctn.cla <-
   `names<-`(lapply(2:10, function(k)
-                         clara(ctn.train[,ct.input.attrs], k,
-                               samples=100, sampsize=200, keep.data=FALSE)), 2:10)
+    clara(ctn.train[,ct.input.attrs], k,
+          samples=100, sampsize=200, keep.data=FALSE)), 2:10)
 
 plot(2:10, sapply(ctn.cla, function(cm) cm$silinfo$avg.width),
      type="l", xlab="k", ylim=c(0, 0.5))
@@ -10106,8 +10113,8 @@ plot(silhouette(ctn.cla[["10"]]), main="k=10")
 ctn.cla7.pred <- predict(ctn.cla[["7"]], ctn.val[,ct.input.attrs])
 
 ct.cla7.tree <- rpart(make.formula("as.factor(ctn.cla[[\"7\"]]$clustering)",
-                                    ct.input.attrs),
-                       ct.train, xval=0)
+                                   ct.input.attrs),
+                      ct.train, xval=0)
 
 ct.cla7.tree.pred <- predict(ct.cla7.tree, ct.val, type="c")
 ct.cla7.tree.cm01 <- confmat01(ct.cla7.tree.pred, as.factor(ctn.cla7.pred))
