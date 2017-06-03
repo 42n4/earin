@@ -1,0 +1,302 @@
+%lualatex --shell-escape  <name>.tex; 
+%view <name>.pdf
+%\documentclass[smaller, proffesionalfonts]{beamer}
+\documentclass[proffesionalfonts]{beamer}
+\usecolortheme[named=gray]{structure}
+\mode<presentation> {
+%\usetheme{Madrid} % My favorite!
+%\usetheme{Boadilla} % Tretty neat, soft color.
+%\usetheme{default}
+\usetheme{Warsaw}
+%\usetheme{Bergen} % This template has nagivation on the left
+%\usetheme{Frankfurt} % Similar to the default with an extra region at the top.
+%\usecolortheme{seahorse} % Simple and clean template
+%\usetheme{Darmstadt} % not so good
+% Uncomment the following line if you want page numbers and using Warsaw theme
+% \setbeamertemplate{footline}[page number]
+\setbeamercovered{transparent}
+%\setbeamercovered{invisible}
+% To remove the navigation symbols from the bottom of frames%
+\setbeamertemplate{navigation symbols}{} 
+}
+
+\usepackage{ifpdf}
+\usepackage{ifluatex}
+\ifluatex
+\usepackage{polyglossia}   
+\setmainlanguage{polish}
+\usepackage{amsmath}
+\def\bm{\boldsymbol}
+\usepackage{lualatex-math}
+\else
+\usepackage{graphicx}
+\usepackage{polski} 
+\usepackage[utf8x]{inputenc}
+\usepackage{bm} 
+\fi
+\usepackage{ucs}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{ragged2e}
+%\apptocmd{\frame}{}{\justifying}{} % Allow optional arguments after frame.
+%\apptocmd{\block}{}{\justifying}{} % Allow optional arguments after frame.
+% For typesetting bold math (not \mathbold)
+
+\usepackage{pgf,tikz}
+\usetikzlibrary{graphdrawing}
+\usetikzlibrary{graphs}
+\usegdlibrary{trees}
+\usetikzlibrary{intersections}
+\usetikzlibrary{arrows,shapes,automata,positioning,calc}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+%\usepackage[active,tightpage,pdftex]{preview}
+%\PreviewEnvironment{tikzpicture}
+\DeclareMathOperator{\sgn}{sign}
+\usepackage{tkz-euclide}
+
+\newcommand{\mycircle}[1]{\tikz{\filldraw[draw=#1,fill=#1] (0,0) circle [radius=0.3em];}}
+\newcommand{\s}[1]{{\scriptscriptstyle 
+    \fontfamily{cmss}
+    \selectfont
+#1}}
+\newcommand{\un}[1]{\underline{#1}}
+\newcommand{\sz}[1]{\scriptsize{#1}}
+\newcommand{\arial}[1]{{ #1}}
+\newcommand{\faup}{ }
+\newcommand{\arit}[1]{{\it #1 \/}}
+\newcommand{\arbf}[1]{\bf{\arial{#1}\/}\faup}
+\newcommand{\SA}[1]{$#1$\faup}
+\newcommand{\argmin}{\arg\!\min} 
+\newcommand{\argmax}{\arg\!\max} 
+%\newcommand{\Treebox}[1]{% \Tr{\psframebox{#1}}}
+
+%\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
+%
+\title[EARIN]{Data Mining Lectures - Decision trees}
+%
+\author{Piotr Wasiewicz}
+\institute[ICS PW]
+{
+Institute of Computer Science\\
+\medskip
+{\emph{pwasiewi@elka.pw.edu.pl}}
+}
+\date{\today}
+% \today will show current date. 
+% Alternatively, you can specify a date.
+
+\begin{document}
+
+\begin{frame}
+\frametitle{Probability}
+\begin{center}
+\large
+\begin{description}
+\item[$P(A)$]$= \frac{T^A}{T}$
+\item[$P(A)$] - the measure of likelihood that an event $A$ will occur
+\item[$T^A$] - all possible results associated with the event $A$
+\item[$T$] - all possible results 
+\end{description}
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional probability}
+\large
+\[P(C|A)=\frac{P(C\cap A)}{P(A)}\textsf{\faup\ \ - conditional probability that a patient }\] 
+\ \ \ \ \ has a disease $C$, if he has symptoms $A$
+\[P(A|C)=\frac{P(A\cap C)}{P(C)}\textsf{\faup\ \  - conditional probability that a patient }\]
+\ \ \ \ \ has symptoms $A$, if he has a disease $C$
+\begin{description}
+\item[$P(C\cap A)$] - probability that a patient has a disease $C$ and symptoms $A$
+\item[$P(C)$] - probability that a patient has a disease $C$
+\item[$P(A)$] - probability of symptoms
+\end{description}
+\normalsize
+\end{frame}
+
+\begin{frame}\frametitle{Bayes theorem}
+\begin{center}
+\large
+\[P(C|A)=\frac{P(C\cap A)}{P(A)}\]  
+\[P(A|C)=\frac{P(A\cap C)}{P(C)}\]\\
+\Large
+\[P(C|A)=\frac{P(A|C)*P(C)}{P(A)}\]
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional probability table}
+\begin{center}
+\small
+Table describing conditional probabilities of diseases, \\
+where the given symptom was observed:\\ 
+\ \\
+   \begin{tabular}{||r||c|c|c|c||}
+   \hline \hline
+    & influenza $C_1$ & cold $C_2$ & pneumonia $C_3$ & allergy  $C_4$ \\
+   \hline
+   headache $A_1$ & $P(C_1|A_1)$ & $P(C_2|A_1)$ & $P(C_3|A_1)$ & $P(C_4|A_1)$  \\
+   \hline
+   cough $A_2$ & $P(C_1|A_2)$ & $P(C_2|A_2)$ & $P(C_3|A_2)$ & $P(C_4|A_2)$  \\
+   \hline
+   sneeze $A_3$  & $P(C_1|A_3)$ & $P(C_2|A_3)$ & $P(C_3|A_3)$ & $P(C_4|A_3)$  \\
+   \hline
+   temperature $A_4$ & $P(C_1|A_4)$ & $P(C_2|A_4)$ & $P(C_3|A_4)$ & $P(C_4|A_4)$  \\
+   \hline \hline
+   \end{tabular}
+\[\sum_{i=1}^{n}P(A_i)=1\qquad \sum_{j=1}^{m}P(C_j|A_i)=1\qquad P(C_j)=\sum_{i=1}^{n}P(A_i)*P(C_j|A_i)\]
+\[P(A_i|C_j)=\frac{P(A_i)*P(C_j|A_i)}{P(C_j)}\qquad P(C_j|A_i)=\frac{P(C_j)*P(A_i|C_j)}{P(A_i)}\]
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{More general Bayes Theorem formula}
+Bayes theorem has the more general form for \un{many} diseases and \un{many} symptoms:
+\begin{center}
+\large
+\[P(C_j|A_{i1}\cap\ldots\cap A_{ik})=\frac{P(C_j)*P(A_{i1}|C_j)*\ldots *P(A_{ik}|C_j)}{\displaystyle\sum_{l=1}^{n}P(C_l)*P(A_{i1}|C_l)*\ldots *P(A_{ik}|C_l)}\]
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bayes Theorem: the comparison of equivalent sets and events}
+\begin{center}
+\normalsize
+   \begin{tabular}{p{5.5cm}|p{5.5cm}}
+   $\Omega$ - a space of independent elementary observed results; $A\in 2^\Omega\Rightarrow A'\in 2^\Omega$ - complementarity; $A,B\in 2^\Omega\Rightarrow A\cup B\in 2^\Omega$ - additivity  &  $F$ - the independent rule set such that $a\in F\Leftrightarrow b\notin F-\{\mathbf{0},a\}$ this means $b\land\neg a=\mathbf{0}$ \\
+   \hline
+   $(2^\Omega,\cup,\cap,',\Omega,\phi)$ & $(F,\lor,\land,\neg,\mathbf{1},\mathbf{0})$ \\
+   \hline
+   $P(\phi)=0\qquad P(\Omega)=1$ & $P(\mathbf{0})=0\qquad P(\mathbf{1})=1$ \\
+   \hline
+   $A\cap A'=\phi\quad A\cup A'=\Omega$ & $a\land\neg a=\mathbf{0}\quad a\lor\neg a=\mathbf{1}$ \\
+   \hline
+   $\forall A,B\in 2^\Omega\quad A\cap B=\phi$ & $\forall a,b\in F\quad a\land b=\mathbf{0}$ \\
+   $P(A\cup B)=P(A)+P(B)$ & $P(a\lor b)=P(a)+P(b)$\\
+   \hline
+   $\forall A\in 2^\Omega\quad P(A)+P(A')=1$ & $\forall a\in F\quad P(a)+P(\neg a)=1$  \\
+   \hline
+   $A\subseteq B\qquad P(A)\le P(B)$ & $(a\Rightarrow b)=\mathbf{1}\qquad P(a)\le P(b)$ \\
+   \end{tabular}
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bayes model}
+\begin{center}
+\large
+Bayes rule\\
+\[P(h|e)=\frac{P(e|h)P(h)}{P(e)}\]\\
+where $h$ means hypothesis and $e$ denotes an event.\\
+Such a rule is just an another form of the usual rule:\\
+\ \\
+\Large
+$e\Rightarrow h$
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bayes Theorem}
+\begin{center}
+\normalsize
+$\exists\ H=\{h_1,\ldots,h_n\}$, where $\forall i\ne j\quad h_i\land h_j=\mathbf{0}\quad\displaystyle\bigcup_{i=1}^{n}h_i=\mathbf{1},\quad P(h_i)>0,\quad i=1,\ldots,n$\\
+$\exists\ \{e_1,\ldots,e_m\}$, where $\displaystyle P(e_1,\ldots,e_m|h_i)=\prod_{j=1}^m P(e_j|h_i),\ i=1,\ldots,n\Leftrightarrow$\\
+$\Leftrightarrow\forall e_j,h_i\quad e_j$ conditionally independent on $h_i$\\[3mm]
+\large
+$P(h_i|e_1,\ldots,e_m)=\frac{\displaystyle P(e_1,\ldots,e_m|h_i)P(h_i)}{\displaystyle\sum_{k=1}^{n}P(e_1,\ldots,e_m|h_k)P(h_k)}$\\
+$P(h_i|e_1,\ldots,e_m)=\frac{\displaystyle\prod_{j=1}^m P(e_j|h_i)}{\displaystyle\sum_{k=1}^n \prod_{j=1}^m P(e_j|h_k)P(h_k)}P(h_i)$
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{PROSPECTOR modifications (1976)}
+\begin{center}
+\large
+An additional assumption: $\displaystyle P(e_1,\ldots,e_m|\neg h_i)=\prod_{j=1}^m P(e_j|\neg h_i),\ i=1,\ldots,n$\\
+New Bayes rule: $\displaystyle P(\neg h|e)=\frac{P(e|\neg h)P(\neg h)}{P(e)}$ or\\[1mm]
+$\displaystyle \frac{P(h|e)}{P(\neg h|e)}=\frac{P(e|h)}{P(e|\neg h)}\frac{P(h)}{P(\neg h)}$\\[1mm]
+$\displaystyle O(h)=\frac{P(h)}{P(\neg h)}$ - a chance \un{a priori}\\[1mm]
+$\displaystyle O(h|e)=\frac{P(h|e)}{P(\neg h|e)}$ - a chance \un{a posteriori}\\[1mm]
+A reliability coefficient: $\displaystyle \lambda=\frac{P(e|h)}{P(e|\neg h)}\Rightarrow O(h|e)=\lambda O(h)$
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Further PROSPECTOR modifications}
+\begin{center}
+\large
+In a general case: $\displaystyle O(h_i|e_1,\ldots,e_m)=O(h_i)\prod_{k=1}^m\lambda_{k_i}$,\\
+where $\displaystyle \lambda_{k_i}=\frac{P(e_k|h_i)}{P(e_k|\neg h_i)}$ \\[8mm]
+$\displaystyle \overline{\lambda}=\frac{P(\neg e|h)}{P(\neg e|\neg h)}\Rightarrow O(h|\neg e)=\overline{\lambda}O(h)$\\[2mm]
+\parbox[b]{115mm}{
+Coefficients $\lambda$ i $\overline{\lambda}$ are defined a priori. $\lambda$ denotes observation sufficiency $e$ (especially for $\lambda\gg 1$) and $\overline{\lambda}$ denotes necessity $e$ (especially for $0\le\overline{\lambda}\le 1$).
+}
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bayes model disadvantages}
+\begin{center}
+\large
+\begin{itemize}
+\item
+Assumptions are not accomplished.
+\item
+Ignorance is hidden in a priori probabilities.
+\item
+Probabilities are known only for elementary observed independently events, but not for their sets.
+\item
+Probabilities are for both negative and positive events at the same time.
+\end{itemize}
+\normalsize
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Naive Bayes classifier assumptions}
+\begin{itemize}
+\item
+Each instance $x$ described by attribute values $a(x)=\langle a_1(x), a_2(x) \ldots a_n(x) \rangle$, where $a_i(x)$ is the given value of the attribute $a_i$ ($a_i(x)\in \{a_{ij}\},\ j\in (1\ldots A_i$)). 
+\item
+Attribute values $a_i(x)$ of instances $x$ are conditionally independent given the target class $C_k$.
+\item
+It is so called Naive Bayes assumption: 
+$\displaystyle P(a(x)|C_k) = \prod_i P(a_i(x) | C_k)$\\
+which is usually not true, but incorrect class probabilities very often permit correct classification.
+\item 
+Conditional probabilities of attribute values $a_i(x)$ given the class $C_k$ are $P(a_i(x) | C_k) = P_{T^{C_k}}(a_i(x)) = \frac{|T^{C_k}_{a_i(x)}|}{|T^{C_k}|}$.
+\item
+$\displaystyle P(C_k|a(x)) = \frac{P(C_k) \prod_i P(a_i(x) | C_k)}{\sum_{C_l\in C}P(C_l) \prod_i P(a_i(x) | C_l)}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Naive Bayes classifier}
+\begin{itemize}
+\item
+The final Naive Bayes classifier hypothesis $h(x)$ predicting the correct class is just the greatest conditional probability:
+$\displaystyle P(C_k|a(x)) = \frac{P(C_k) P(a(x) | C_k)}{\sum_{C_l\in C}P(C_l) P(a(x) | C_l)}$
+\item
+$\displaystyle P(C_k|a(x)) = \frac{\displaystyle P(C_k) \prod_i P(a_i(x) | C_k)}{\displaystyle \sum_{C_l\in C}P(C_l) \prod_i P(a_i(x) | C_l)}$
+\item
+$\displaystyle h(x) = \argmax_{C_k \in C} P(C_k|a(x))$
+\item
+In a case of not present values in training instances to prevent prediction errors the number of values $A_i$ of the attribute $a_i$ is added to conditional probability:\\
+$P(a_i(x) | C_k) = P_{T^{C_k}}(a_i(x)) = \frac{|T^{C_k}_{a_i(x)}|+1}{|T^{C_k}|+A_i}$.
+$\displaystyle $
+\end{itemize}
+\end{frame}
+
+\end{document}
+
+\begin{frame}
+\frametitle{}
+\begin{block}{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{block}
+\end{frame}
+

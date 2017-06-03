@@ -1,0 +1,544 @@
+%lualatex --shell-escape  <name>.tex; 
+%view <name>.pdf
+%\documentclass[smaller, proffesionalfonts]{beamer}
+\documentclass[proffesionalfonts]{beamer}
+\usecolortheme[named=gray]{structure}
+\mode<presentation> {
+%\usetheme{Madrid} % My favorite!
+%\usetheme{Boadilla} % Tretty neat, soft color.
+%\usetheme{default}
+\usetheme{Warsaw}
+%\usetheme{Bergen} % This template has nagivation on the left
+%\usetheme{Frankfurt} % Similar to the default with an extra region at the top.
+%\usecolortheme{seahorse} % Simple and clean template
+%\usetheme{Darmstadt} % not so good
+% Uncomment the following line if you want page numbers and using Warsaw theme
+% \setbeamertemplate{footline}[page number]
+\setbeamercovered{transparent}
+%\setbeamercovered{invisible}
+% To remove the navigation symbols from the bottom of slides%
+\setbeamertemplate{navigation symbols}{} 
+}
+
+\usepackage{ifpdf}
+\usepackage{ifluatex}
+\ifluatex
+\usepackage{polyglossia}   
+\setmainlanguage{polish}
+\usepackage{amsmath}
+\def\bm{\boldsymbol}
+\usepackage{lualatex-math}
+\else
+\usepackage{graphicx}
+\usepackage{polski} 
+\usepackage[utf8x]{inputenc}
+\usepackage{bm} 
+\fi
+\usepackage{ucs}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{ragged2e}
+%\apptocmd{\frame}{}{\justifying}{} % Allow optional arguments after frame.
+%\apptocmd{\block}{}{\justifying}{} % Allow optional arguments after frame.
+% For typesetting bold math (not \mathbold)
+
+\usepackage{pgf,tikz}
+\usetikzlibrary{graphdrawing}
+\usetikzlibrary{graphs}
+\usegdlibrary{trees}
+\usetikzlibrary{intersections}
+\usetikzlibrary{arrows,shapes,automata,positioning,calc}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+%\usepackage[active,tightpage,pdftex]{preview}
+%\PreviewEnvironment{tikzpicture}
+\newcommand{\mycircle}[1]{\tikz{\filldraw[draw=#1,fill=#1] (0,0) circle [radius=0.3em];}}
+\DeclareMathOperator{\sgn}{sign}
+\usepackage{tkz-euclide}
+
+%\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
+%
+\title[EARIN]{Data Mining Lectures - Decision trees}
+%
+\author{Piotr Wąsiewicz}
+\institute[ICS PW]
+{
+Institute of Computer Science\\
+\medskip
+{\emph{pwasiewi@elka.pw.edu.pl}}
+}
+\date{\today}
+% \today will show current date. 
+% Alternatively, you can specify a date.
+
+\begin{document}
+\lstset{language=R}
+
+
+
+\pgfmathsetseed{1138} % set the random seed
+\pgfplotstableset{ % Define the equations for x and y
+    create on use/x/.style={create col/expr={42+2*\pgfplotstablerow}},
+    create on use/y/.style={create col/expr={(0.6*\thisrow{x}+130)+5*rand}}
+}
+% create a new table with 30 rows and columns x and y:
+\pgfplotstablenew[columns={x,y}]{30}\loadedtable
+
+\begin{frame}
+\frametitle{Linear regression}
+\begin{tikzpicture}
+\begin{axis}[
+xlabel=Weight (kg), % label x axis
+ylabel=Height (cm), % label y axis
+axis lines=left,    %set the position of the axes
+xmin=40, xmax=105,  % set the min and max values of the x-axis
+ymin=150, ymax=200, % set the min and max values of the y-axis
+clip=false
+]
+\addplot [only marks] table {\loadedtable};
+\addplot [no markers, thick, red] table [y={create col/linear regression={y=y}}] {\loadedtable} node [anchor=west] 
+{$\pgfmathprintnumber[precision=2, fixed zerofill]{\pgfplotstableregressiona} \cdot \mathrm{Weight} + 
+\pgfmathprintnumber[precision=1]{\pgfplotstableregressionb}$};
+\end{axis}
+\end{tikzpicture}
+\begin{block}{}
+\begin{itemize}
+\item[\ ] Linear Regression finds trends in data.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Optimization problem with constraints}
+\begin{block}{}
+\begin{itemize}
+\item Minimize f(a) as a primal optimization problem
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\min}
+& & f(a) \\
+& \text{with constraints:}
+& & g_i(a) = 0, \; i = 1, \ldots, m.
+\end{aligned}
+\end{equation*}
+\item Lagrangian is made of f(a) and constraints: $L(a,\lambda)=f(a)+\lambda\times g(a)$
+\item Minimize $L(a,\lambda)$ in a domain $a$ in a dual optimization problem.
+\item After minimization with derivatives of Lagrangian $L(a,\lambda)$ equal to 0, maximize $L(a,\lambda)$ in a domain $lambda$.
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\min}\ \underset{\lambda}{\max} &  & f(a)+\lambda\times g(a)
+\end{aligned}
+\end{equation*}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\scriptsize
+\frametitle{Optimization primal and dual problem example}
+\begin{tikzpicture} 
+\begin{axis}[ xlabel=$g(a)$, ylabel={$f(a)$}, 
+xmin=-2.5, xmax=4.0, ymin=-2.0, ymax=4.0, legend pos=outer north east]
+\addlegendimage{red,mark=x}
+\addlegendimage{blue,mark=.}
+\addlegendimage{green, mark=square}
+\addlegendimage{green,mark=triangle}
+\addlegendimage{black, mark=o}
+%\addlegendimage{only marks, mark=o}
+%\addlegendimage{no markers,blue}
+% http://pgfplots.sourceforge.net/gallery.html
+% use TeX as calculator: 
+\addplot [only marks,mark=*] coordinates { (0,2) };
+\addplot[color=black,mark=-] coordinates { (0,-4) (0,4) }; 
+\addplot[color=black,mark=-] {0}; 
+\addplot[color=red,mark=x] {x^2-x+2}; 
+\addlegendentry{$f(a)$}
+\addplot[color=blue,mark=.] {x}; 
+\addlegendentry{$g(a)$}
+\addplot[color=green,mark=square] {x^2-0.5*x+2}; 
+\addlegendentry{$f(a)+\frac{1}{2}\times g(a)$}
+\addplot[color=green,mark=triangle] {x^2-3*x+2}; 
+\addlegendentry{$f(a)+\lambda\times g(a)$}
+\addplot[color=black,mark=o] {x^2+2}; 
+\addlegendentry{$f(a)+1\times g(a)$}
+\end{axis} 
+\end{tikzpicture} 
+\begin{block}{}
+\begin{itemize}
+\item $\lambda = 1$ for Lagrangian $\max_{\lambda>0}\min_{a}f(a)+\lambda\times g(a)$ dual optimal solution.
+\item Result is the same for primal and dual problem solution: (0,2)
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{VC (Vapnik–Chervonenkis) dimension of hyperplanes in $\mathbb R^n$}
+  \begin{itemize}
+  \item For 4 points in 2D (a square or a matrix 2x2) and two classes:
+    \begin{itemize}
+    \item it is not always possible to separate them with lines. 
+	\item[\ ]
+	\begin{tabular}{cc}
+	$c_1$ & $c_2$ \\
+	$c_2$ & $c_1$ \\
+	\end{tabular}
+	$==>$
+	\begin{tabular}{c|c}
+	$c_1$ & $c_2$ \\
+	$c_2$ & $c_1$ \\
+	\end{tabular}
+	$or$
+	\begin{tabular}{cc}
+	$c_1$ & $c_2$ \\
+	\hline
+	$c_2$ & $c_1$ \\
+	\end{tabular}
+    \end{itemize}
+  \item $n+1$ points in  $\mathbb R^n$ can not be separated linearly
+  \item The VC dimension of hyperplanes in $\mathbb R^n$ is $n + 1$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Support Vector Machines: basic linear examples}
+  \begin{itemize}
+  \item Linear separation for two classes
+  \item Some training data $\{\mathbf a_i, c_i\}^i_m$, $\mathbf a_i \in \mathbb{R}^n$, and $c_i \in \{ -1, 1\}$
+  \item Train to obtain the separation hyperplane:
+    \begin{itemize}
+    \item Minimize $d_+ + d_-$ to receive the shortest distances from the hyperplane 
+    \begin{itemize}
+    \item to closest positive point $d_+$
+    \item to closest negative point $d_-$
+    \end{itemize}
+    \end{itemize}
+  \item The goal is to find the separating hyperplane: $\mathbf w \mathbf a + b = 0$, where
+    \begin{itemize}
+    \item a vector $w$ is normal to the hyperplane
+    \item $\displaystyle\frac{|b|}{\|\mathbf w\|}$ is the distance to origin $(0,0)$
+    \item $\|\mathbf w\|$ the length of the vector $\mathbf w$
+    \end{itemize}
+  \item Designing a road between trees on the left and rocks on the right.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines}
+\begin{tikzpicture}[>=stealth']
+  % draw axes
+  \draw [<->,thick] (0,5) node (yaxis) [above] {$a_2$}
+        |- (5,0) node (xaxis) [right] {$a_1$};
+  % draw line
+  \draw (0,-1) -- (5,4); % y=a-1
+  \draw[dashed] (-1,0) -- (4,5); % y=a+1
+  \draw[dashed] (2,-1) -- (6,3); % y=a-3
+  % \draw labels
+  \draw (3.5,3) node[rotate=45,font=\small] 
+        {$\mathbf{w}\cdot \mathbf{a} + b = 0$};
+  \draw (2.5,4) node[rotate=45,font=\small] 
+        {$\mathbf{w}\cdot \mathbf{a} + b = 1$};
+  \draw (4.5,2) node[rotate=45,font=\small] 
+        {$\mathbf{w}\cdot \mathbf{a} + b = -1$};
+  % draw distance
+  \draw[dotted] (4,5) -- (6,3);
+  \draw (5.25,4.25) node[rotate=-45] {$\frac{2}{\Vert \mathbf{w} \Vert}$};
+  \draw[dotted] (0,0) -- (0.5,-0.5);
+  \draw (0,-0.5) node[rotate=-45] {$\frac{b}{\Vert \mathbf{w} \Vert}$};
+  \draw[->] (2,1) -- (1.5,1.5);
+  \draw (1.85,1.35) node[rotate=-45] {$\mathbf{w}$};
+  % draw negative dots
+  \fill[red] (0.5,1.5) circle (3pt);
+  \fill[red]   (1.5,2.5)   circle (3pt);
+  \fill[black] (1,2.5)     circle (3pt);
+  \fill[black] (0.75,2)    circle (3pt);
+  \fill[black] (0.6,1.9)   circle (3pt);
+  \fill[black] (0.77, 2.5) circle (3pt);
+  \fill[black] (1.5,3)     circle (3pt);
+  \fill[black] (1.3,3.3)   circle (3pt);
+  \fill[black] (0.6,3.2)   circle (3pt);
+  % draw positive dots
+  \draw[red,thick] (4,1)     circle (3pt); 
+  \draw[red,thick] (3.3,.3)  circle (3pt); 
+  \draw[black]     (4.5,1.2) circle (3pt); 
+  \draw[black]     (4.5,.5)  circle (3pt); 
+  \draw[black]     (3.9,.7)  circle (3pt); 
+  \draw[black]     (5,1)     circle (3pt); 
+  \draw[black]     (3.5,.2)  circle (3pt); 
+  \draw[black]     (4,.3)    circle (3pt); 
+\end{tikzpicture}
+\begin{block}{}
+\begin{itemize}
+\item $\max \frac{2}{\|w\|}$ - maximize the margin between parallel lines
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines}
+  \begin{itemize}
+  \item $d_+$, $d_-$ the shortest distances from labeled points to hyperplane
+  \item A margin $m = d_+ + d_-$
+  \item The optimal separating hyperplane maximizes $m$ and minimizes the VC dimension
+  \item For the separating hyperplane:
+\setcounter{equation}{0}
+    \begin{eqnarray}
+      \mathbf w \mathbf a_i + b \geq +1,& c_i = +1\\
+      \mathbf w \mathbf a_i + b \leq -1,& c_i = -1\\
+      \equiv\\
+      c_i(\mathbf w \mathbf a_i + b) - 1 \geq 0,& \forall i
+    \end{eqnarray}
+  \item For the closest points the equalities are satisfied, so:
+    \begin{equation}
+      d_+ + d_- = \frac{|1-b|}{\|w\|} + \frac{|-1-b|}{\|w\|} = \frac{2}{\|w\|}
+    \end{equation}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines: the linear example}
+\setcounter{equation}{0}
+\begin{minipage}[t]{.45\textwidth}
+\begin{tikzpicture}[>=stealth']
+  % draw axes
+  \draw [<->,thick] (0,3.5) node (yaxis) [above] {$a_2$}
+        |- (3.5,0) node (xaxis) [right] {$a_1$};
+  % draw line
+  \draw[dashed] (0,3) -- (2,3);   % class 1
+  \draw[dashed] (2,0) -- (2,3);   % class 1
+  \draw[dashed] (0,1) -- (1,1);   % class 2
+  \draw[dashed] (1,0) -- (1,1);   % class 2
+  \draw[red,thick] (0,2.75) -- (3.5,1);   % class 2
+  \draw[red,dotted, ->] (2,3) -- (1,1); % margin
+  % draw negative dots
+  \fill[blue] (1,1) circle (2pt);  % class 2
+  % draw positive dots
+  \fill[black] (2,3) circle (2pt);% class 1
+  % draw the optimum point between dots
+  \fill[red] (1.5,2) circle (2pt);% class 1
+  % \draw labels
+  \draw (1,1) node[yshift=0.2cm,rotate=0,font=\tiny] {$(1,1)$};
+  \draw (2,3) node[yshift=0.2cm,rotate=0,font=\tiny] {$(2,3)$};
+  \draw (2,0) node[yshift=0.2cm,rotate=0,font=\tiny] {$(2,0)$};
+  \draw (1.5,2) node[yshift=-0.8cm,rotate=63,font=\tiny] {$\mathbf w=(2,3)-(1,1)=(x,2x)$};
+\end{tikzpicture}
+\end{minipage}
+\begin{minipage}[t]{.45\textwidth}
+\begin{tikzpicture}[>=stealth']
+  % draw axes
+  \draw [<->,thick] (0,3.5) node (yaxis) [above] {$a_2$}
+        |- (3.5,0) node (xaxis) [right] {$a_1$};
+  % draw line
+  \draw[dashed] (0,3) -- (2,3);   % class 1
+  \draw[dashed] (2,0) -- (2,3);   % class 1
+  \draw[dashed] (0,1) -- (1,1);   % class 2
+  \draw[dashed] (1,0) -- (1,1);   % class 2
+  \draw[red,thick] (0,2.75) -- (3.5,1);   % class 2
+  \draw[red,dotted, ->] (2,3) -- (1,1); % margin
+  % draw negative dots
+  \fill[blue] (1,1) circle (2pt);  % class 2
+  % draw positive dots
+  \fill[black] (2,3) circle (2pt);% class 1
+  % draw the optimum point between dots
+  \fill[red] (1.5,2) circle (2pt);% class 1
+  % \draw labels
+  \draw (1,1) node[yshift=0.2cm,rotate=0,font=\tiny] {$(1,1)$};
+  \draw (2,3) node[yshift=0.2cm,rotate=0,font=\tiny] {$(2,3)$};
+  \draw (2,0) node[yshift=0.2cm,rotate=0,font=\tiny] {$(2,0)$};
+  \draw (1.5,2) node[yshift=0.4cm,rotate=-27,font=\tiny] {$\mathbf g(a) = \frac{2}{5}a_1+\frac{4}{5}a_2-\frac{11}{4} - SVM!$};
+  \draw (1.5,2) node[red,yshift=-0.4cm,rotate=-27,font=\tiny] {$\mathbf w = (\frac{2}{5},\frac{4}{5}) = support\ vectors!$};
+\end{tikzpicture}
+\end{minipage}
+\begin{minipage}[t]{.45\textwidth}
+\tiny
+    \begin{eqnarray}
+	  \mathbf w = (2,3) - (1,1) = (x, 2x) \\
+      for\ point\ (2,3): \mathbf w \mathbf a + b = +1 \\
+	   2x + 6x + b = 1 \\
+	   b = 1 - 8x \\
+      for\ point\ (1,1): \mathbf w \mathbf a + b = -1 \\
+	   x + 2x + b = -1 \\
+	   x + 2x + 1 - 8x = -1 \\
+	   x = \frac{2}{5}\ b = -\frac{11}{5}
+    \end{eqnarray}
+\end{minipage}
+\begin{minipage}[t]{.45\textwidth}
+\tiny
+    \begin{eqnarray}
+	\underline{Support\ vectors}: w = (\frac{2}{5},\frac{4}{5}) \\
+	\underline{SVM}: g(a) = \mathbf w \mathbf a + b \\
+	\underline{SVM}: g(a) = \frac{2}{5}a_1+\frac{4}{5}a_2-\frac{11}{4} \\
+	\forall{c(a)\in c_1}\  g(a) >= 1 \\
+	\forall{c(a)\in c_2}\  g(a) <= -1 
+    \end{eqnarray} 
+\end{minipage}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines: Lagrangian}
+  \begin{itemize}
+  \item The constraints is more easy to handle.
+  \item Using dual form SVM models predictions and calculations can be performed without using any attribute values other than inside dot products.
+  \item Instead of calculating model parameters Lagrange multipliers are used.
+  \item Prepared for the kernel trick to swap the dot product with the kernel special function.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\small
+\frametitle{Support Vector Machines: Lagrangian}
+\begin{itemize}
+\item
+For $\{\mathbf{a}_i, c_i\}\in\mathbb{R}^N\times\{-1, 1\}$ a primal problem minimization:
+\setcounter{equation}{0}
+\begin{align}
+  \text{min}_{\mathbf{w}, b}&\qquad\frac 12||\mathbf{w}||^2\nonumber\\
+\text{Subject to}&\qquad
+c_i\left(\left\langle{\mathbf{w},\mathbf{a}}\right\rangle +
+  b\right)\geq 1.\label{eq:1}
+\end{align}
+\item
+An unconstrained problem with the Lagrange multipliers for minimization $\min_{\mathbf{w}, b} L(\mathbf{w}, b, \lambda)$
+\begin{align}
+  L(\mathbf{w}, b, \lambda) = \frac 12||\mathbf{w}||^2-\sum_i\lambda_i\left(c_i(\left\langle{\mathbf{w},\mathbf{a}}\right\rangle + b)-1\right),
+\end{align}
+  \item Convex quadratic programming dual problem $\max_{\lambda>0} L_D$
+    \begin{align}
+      L_D = \displaystyle\sum^l_{i=1} \lambda_i - \frac{1}{2}\displaystyle\sum_{i,j=1}^l \lambda_i \lambda_j c_i c_j \langle\mathbf a_i \mathbf a_j\rangle\\
+	  C \geq \lambda_i \geq 0\\
+	  \sum_{i} \lambda_{i}c_{i} =0 
+    \end{align}
+\end{itemize}
+\end{frame}
+
+\pgfplotsset{compat=1.12}
+\begin{frame}
+\frametitle{The dot product surface $x^2+y^2$ cut by a plane $x+y+4$}
+\begin{tikzpicture}[
+        %declare function={f(\x,\y)=20*\x*exp(-\x^2-\y^2);},
+        declare function={f(\x,\y)=(\x)^2+(\y)^2;},
+		%declare function={g(\x,\y)=(\x+1)^2+(\y-1)^2;},
+        declare function={g(\x,\y)=(\x+\y+4;},
+		    ]
+    \begin{axis}[   width=250pt,
+                    height=250pt,
+                    domain=-2:2,
+                    view={-50}{20}
+                ]
+        \addplot3 [surf, opacity=.3, samples=50] {f(x,y)};
+        \addplot3 [mesh,red, opacity=.1, samples=50] {g(x,y)};
+		\addplot3 [samples=50,mark=none, contour gnuplot={labels=false,levels={5},handler/.style={only marks}}] {g(x,y)};
+		%\addplot3 [samples=50,mark=none, contour gnuplot={labels=false,levels={5},handler/.style={only marks}}] {(x+1)^2+(y-1)^2};
+		 \addplot3[black] table[x index=0, y index=1, z expr={f(x,y)}] {dm_svm_contourtmp0.table};
+    \end{axis}
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines: Lagrangian}
+  \begin{itemize}
+  \item From dual problem
+    \begin{align*}
+  \max_{\lambda>0}\min_{\mathbf{w},b}\qquad L(\mathbf{w}, b, \lambda)
+    \end{align*}
+  \item
+to a quadratic optimization problem 
+    \begin{align*}
+\max_{\lambda>0}\sum_{i} \lambda_{i}-\frac{1}{2} \sum_{i,j} \alpha^{t}K\alpha\\
+K_{ij}=\langle\mathbf a_i \mathbf a_j\rangle\\
+\alpha_{i}=\lambda_{i}c_{i} 
+    \end{align*}
+  \item Solution only depends on support vectors $\mathbf{w}_{\lambda>0}$
+  \item All others have $\lambda_i=0$ and can be moved arbitrarily far from the decision hyperplane or removed
+  \item Such the dual problem is solved with the help of a gradient descent, which is appropriate for dot products. 
+  \item The kernel trick can be applied and $K$ can be replaced by an inner product $\phi(x_{i}).\phi(x_{j})$ in a higher dimensional space.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Support Vector Machines: space transformation}
+  \begin{itemize}
+  \item Take points from $\mathbb R^d$ to some space $\mathcal H$:
+\setcounter{equation}{0}
+    \begin{equation}
+      \Phi : \mathbb R^d \rightarrow \mathcal H
+    \end{equation}
+  \item Choose kernel function $K$ such that
+    \begin{equation}
+      K(a_i, a_j) = \Phi(\mathbf a_i) \Phi(\mathbf a_j)
+    \end{equation}
+  \item Since in the Lagrangian formula we only have $a_i$ in dot products, we don't even need to know $\Phi$!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Support Vector Machines: kernel}
+  \begin{itemize}
+  \item Replacing $\langle\mathbf a_i \mathbf a_j\rangle$ with  $K(\mathbf a_i, \mathbf a_j)$ everywhere do all the magic.
+  \item Training is identical and takes almost similar time.
+  \item Separation is still linear, but in a different space (infinite-dimensional!)
+  \item Kernel examples:
+  \begin{itemize}
+  \item Gaussian Kernel
+\setcounter{equation}{0}
+    \begin{equation}
+      K(\mathbf a_i, \mathbf a_j) = e^\frac{-\|\mathbf a_i - \mathbf a_j\|^2}{2\sigma^2}
+    \end{equation}
+  \item Polynomial
+    \begin{equation}
+      K(\mathbf a_i, \mathbf a_j) = (\gamma\langle\mathbf a_i \mathbf a_j\rangle + b)^p
+    \end{equation}
+  \item Based on neural net elements
+    \begin{equation}
+      K(\mathbf a_i, \mathbf a_j) = \tanh(\kappa\langle\mathbf a_i \mathbf a_j\rangle - \delta)^p
+    \end{equation}
+  \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{SVM For Multiple Classes}
+  \begin{itemize}
+  \item Build $n$ ``1-vs-all'' classifiers:
+  \begin{itemize}
+  \item It costs $n$ times the complexity of one classifier and the most confident answer should be chosen.
+  \end{itemize}
+  \item Build $\frac{n(n-1)}{2}$ ``1-vs-1'' classifiers:
+  \begin{itemize}
+    \item The instances are assigned by voting, so many classifiers have a small number of instances.
+  \end{itemize}
+  \item Large Margin DAG’s for Multiclass Classifications (Platt) means the Decision Directed Acyclic Graph (DDAG), which is used to combine many two­class classifiers into a multiclass classifier.
+  \item Probabilities are calibrated by logistic regression on the SVM’s scores.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Conclusions}
+  \begin{itemize}
+  %http://scikit-learn.org/stable/modules/svm.html#scores-probabilities
+  \item Effective in cases where number of dimensions is greater than the number of samples.
+  \item Support Vector Machines have different performance depending on the scaling of the data.
+  \item Uses a subset of training points in the decision function (called support vectors), so it is also memory efficient.
+  \item Complexity dependent on the number of support vectors (and also the kernel type) and is generally between $O(n^2)$ and $O(n^3)$ with $n$ the amount of training instances.
+  \item Performance depends on choice of kernel and parameters.
+  \item If the number of features is much greater than the number of samples, the method is likely to give poor performances.
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
+\begin{frame}
+\frametitle{}
+\begin{block}{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\scriptsize
+%\includegraphics[width=11.8cm]{11gdiag\_01.jpg}
+\frametitle{}
+\begin{lstlisting}
+\end{lstlisting}
+\end{frame}
+
