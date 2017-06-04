@@ -59,7 +59,7 @@
 
 %\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
 %
-\title[EARIN]{Data Mining Lectures - Decision trees}
+\title[EARIN]{Data Mining Lectures - Support Vector Machines}
 %
 \author{Piotr Wąsiewicz}
 \institute[ICS PW]
@@ -75,7 +75,9 @@ Institute of Computer Science\\
 \begin{document}
 \lstset{language=R}
 
-
+\begin{frame}
+\titlepage
+\end{frame}
 
 \pgfmathsetseed{1138} % set the random seed
 \pgfplotstableset{ % Define the equations for x and y
@@ -124,62 +126,19 @@ P(1|a)=logit^{-1}(g(a))=\frac{e^{g(a)}}{e^{g(a)}+1}
 \end{frame}
 
 \begin{frame}
-\frametitle{Optimization problem with constraints}
-\begin{itemize}
-\item Minimize f(a) as a primal optimization problem
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\min}
-& & f(a) \\
-& \text{with constraints:}
-& & g_i(a) = 0, \; i = 1, \ldots, m.
-\end{aligned}
-\end{equation*}
-\item Lagrangian is made of f(a) and constraints: $L(a,\lambda)=f(a)+\lambda g(a)$
-\item Minimize $L(a,\lambda)$ in a domain $a$ in a dual optimization problem.
-\item After minimization with derivatives of Lagrangian $L(a,\lambda)$ equal to 0, maximize $L(a,\lambda)$ in a domain $lambda$.
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\min}\ \underset{\lambda}{\max} &  & f(a)+\lambda g(a)
-\end{aligned}
-\end{equation*}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\scriptsize
-\frametitle{Optimization primal and dual problem example}
+\frametitle{Logistic function}
 \begin{tikzpicture} 
 \begin{axis}[ xlabel=$g(a)$, ylabel={$f(a)$}, 
-xmin=-2.5, xmax=4.0, ymin=-2.0, ymax=4.0, legend pos=outer north east]
-\addlegendimage{red,mark=x}
-\addlegendimage{blue,mark=.}
-\addlegendimage{green, mark=square}
-\addlegendimage{green,mark=triangle}
-\addlegendimage{black, mark=o}
-%\addlegendimage{only marks, mark=o}
-%\addlegendimage{no markers,blue}
-% http://pgfplots.sourceforge.net/gallery.html
-% use TeX as calculator: 
-\addplot [only marks,mark=*] coordinates { (0,2) };
-\addplot[color=black,mark=-] coordinates { (0,-4) (0,4) }; 
-\addplot[color=black,mark=-] {0}; 
-\addplot[color=red,mark=x] {x^2-x+2}; 
-\addlegendentry{$f(a)$}
-\addplot[color=blue,mark=.] {x}; 
-\addlegendentry{$g(a)$}
-\addplot[color=green,mark=square] {x^2-0.5*x+2}; 
-\addlegendentry{$f(a)+\frac{1}{2} g(a)$}
-\addplot[color=green,mark=triangle] {x^2-3*x+2}; 
-\addlegendentry{$f(a)+\lambda g(a)$}
-\addplot[color=black,mark=o] {x^2+2}; 
-\addlegendentry{$f(a)+1 g(a)$}
+xmin=-5, xmax=5, ymin=-0.15, ymax=1.15, legend pos=outer north east]
+\addlegendimage{green, mark=x}
+\addplot[color=black,mark=-] coordinates { (0,-0.15) (0,1.15) }; 
+\addplot[color=green,mark=x] {e^x/(e^x+1)}; 
+\addlegendentry{$\frac{e^{g(a)}}{e^{g(a)}+1}$}
 \end{axis} 
 \end{tikzpicture} 
 \begin{block}{}
 \begin{itemize}
-\item $\lambda = 1$ for Lagrangian $\max_{\lambda>0}\min_{a}f(a)+\lambda g(a)$ dual optimal solution.
-\item Result is the same for primal and dual problem solution: (0,2)
+\item The logistic function estimates probability (e.g. needed for ROC) of logical regression classification results.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -397,6 +356,66 @@ xmin=-2.5, xmax=4.0, ymin=-2.0, ymax=4.0, legend pos=outer north east]
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Optimization problem with constraints}
+\begin{itemize}
+\item Minimize f(a) as a primal optimization problem
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\min}
+& & f(a) \\
+& \text{with constraints:}
+& & g_i(a) = 0, \; i = 1, \ldots, m.
+\end{aligned}
+\end{equation*}
+\item Lagrangian is made of f(a) and constraints: $L(a,\lambda)=f(a)+\lambda g(a)$
+\item Minimize $L(a,\lambda)$ in a domain $a$ in a dual optimization problem.
+\item After minimization with derivatives of Lagrangian $L(a,\lambda)$ equal to 0, maximize $L(a,\lambda)$ in a domain $lambda$.
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\min}\ \underset{\lambda}{\max} &  & f(a)+\lambda g(a)
+\end{aligned}
+\end{equation*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\scriptsize
+\frametitle{Optimization primal and dual problem example}
+\begin{tikzpicture} 
+\begin{axis}[ xlabel=$g(a)$, ylabel={$f(a)$}, 
+xmin=-2.5, xmax=4.0, ymin=-2.0, ymax=4.0, legend pos=outer north east]
+\addlegendimage{red,mark=x}
+\addlegendimage{blue,mark=.}
+\addlegendimage{green, mark=square}
+\addlegendimage{green,mark=triangle}
+\addlegendimage{black, mark=o}
+%\addlegendimage{only marks, mark=o}
+%\addlegendimage{no markers,blue}
+% http://pgfplots.sourceforge.net/gallery.html
+% use TeX as calculator: 
+\addplot [only marks,mark=*] coordinates { (0,2) };
+\addplot[color=black,mark=-] coordinates { (0,-4) (0,4) }; 
+\addplot[color=black,mark=-] {0}; 
+\addplot[color=red,mark=x] {x^2-x+2}; 
+\addlegendentry{$f(a)$}
+\addplot[color=blue,mark=.] {x}; 
+\addlegendentry{$g(a)$}
+\addplot[color=green,mark=square] {x^2-0.5*x+2}; 
+\addlegendentry{$f(a)+\frac{1}{2} g(a)$}
+\addplot[color=green,mark=triangle] {x^2-3*x+2}; 
+\addlegendentry{$f(a)+\lambda g(a)$}
+\addplot[color=black,mark=o] {x^2+2}; 
+\addlegendentry{$f(a)+1 g(a)$}
+\end{axis} 
+\end{tikzpicture} 
+\begin{block}{}
+\begin{itemize}
+\item $\lambda = 1$ for Lagrangian $\max_{\lambda>0}\min_{a}f(a)+\lambda g(a)$ dual optimal solution.
+\item Result is the same for primal and dual problem solution: (0,2)
+\end{itemize}
+\end{block}
+\end{frame}
 
 \begin{frame}
 \small
