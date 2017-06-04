@@ -160,7 +160,3 @@ cost_history[seq(1,num_iters, by=100)]      # the cost function plot
 plot(cost_history, type='l', col='blue', lwd=2, main='Funkcja kosztu', ylab='koszt', xlab='Iteracja')
 Sys.sleep(2)                                # 2 second pause
 
-#https://www.svm-tutorial.com/2014/10/support-vector-regression-r/
-#the objective of the SVM is to find  the optimal separating hyperplane which maximizes the margin of the training data
-#https://www.r-bloggers.com/learning-kernels-svm/
-#http://www.kdnuggets.com/2017/03/building-regression-models-support-vector-regression.html
