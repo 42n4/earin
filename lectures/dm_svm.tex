@@ -26,6 +26,7 @@
 \usepackage{polyglossia}   
 \setmainlanguage{polish}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \def\bm{\boldsymbol}
 \usepackage{lualatex-math}
 \else
@@ -103,14 +104,27 @@ clip=false
 \end{tikzpicture}
 \begin{block}{}
 \begin{itemize}
-\item[\ ] Linear Regression finds trends in data.
+\item[\ ] Linear Regression $Height=g(Weight)$ finds a trend in data.
 \end{itemize}
 \end{block}
 \end{frame}
 
 \begin{frame}
+\frametitle{Linear regression classifiers}
+\begin{itemize}
+\item Two-class classification - domain linear partition into the positive and negative regions by comparing against the threshold $g(a)=\langle \mathbf w \mathbf a \rangle = \langle w_{n+1}^1 a_{n+1}^1\rangle$, where $a_{n+1}=1$ for the intercept term $b=w_0=w_{n+1}$ from $g(a)=w_n^1a_n^1+w_0$
+\[
+h(a) = H(g(a)) = \left\{\begin{matrix} 1  & \text{if\ } g(a) \geq 0 \\ 0 & \text{otherwise} \end{matrix}\right.
+\]
+\item Class probability modeling - the logit representation $logit(p)=\ln{\frac{p}{1-p}}$, especially its inverse function called the logistic function
+\[
+P(1|a)=logit^{-1}(g(a))=\frac{e^{g(a)}}{e^{g(a)}+1}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Optimization problem with constraints}
-\begin{block}{}
 \begin{itemize}
 \item Minimize f(a) as a primal optimization problem
 \begin{equation*}
@@ -121,16 +135,15 @@ clip=false
 & & g_i(a) = 0, \; i = 1, \ldots, m.
 \end{aligned}
 \end{equation*}
-\item Lagrangian is made of f(a) and constraints: $L(a,\lambda)=f(a)+\lambda\times g(a)$
+\item Lagrangian is made of f(a) and constraints: $L(a,\lambda)=f(a)+\lambda g(a)$
 \item Minimize $L(a,\lambda)$ in a domain $a$ in a dual optimization problem.
 \item After minimization with derivatives of Lagrangian $L(a,\lambda)$ equal to 0, maximize $L(a,\lambda)$ in a domain $lambda$.
 \begin{equation*}
 \begin{aligned}
-& \underset{a}{\min}\ \underset{\lambda}{\max} &  & f(a)+\lambda\times g(a)
+& \underset{a}{\min}\ \underset{\lambda}{\max} &  & f(a)+\lambda g(a)
 \end{aligned}
 \end{equation*}
 \end{itemize}
-\end{block}
 \end{frame}
 
 \begin{frame}
@@ -156,16 +169,16 @@ xmin=-2.5, xmax=4.0, ymin=-2.0, ymax=4.0, legend pos=outer north east]
 \addplot[color=blue,mark=.] {x}; 
 \addlegendentry{$g(a)$}
 \addplot[color=green,mark=square] {x^2-0.5*x+2}; 
-\addlegendentry{$f(a)+\frac{1}{2}\times g(a)$}
+\addlegendentry{$f(a)+\frac{1}{2} g(a)$}
 \addplot[color=green,mark=triangle] {x^2-3*x+2}; 
-\addlegendentry{$f(a)+\lambda\times g(a)$}
+\addlegendentry{$f(a)+\lambda g(a)$}
 \addplot[color=black,mark=o] {x^2+2}; 
-\addlegendentry{$f(a)+1\times g(a)$}
+\addlegendentry{$f(a)+1 g(a)$}
 \end{axis} 
 \end{tikzpicture} 
 \begin{block}{}
 \begin{itemize}
-\item $\lambda = 1$ for Lagrangian $\max_{\lambda>0}\min_{a}f(a)+\lambda\times g(a)$ dual optimal solution.
+\item $\lambda = 1$ for Lagrangian $\max_{\lambda>0}\min_{a}f(a)+\lambda g(a)$ dual optimal solution.
 \item Result is the same for primal and dual problem solution: (0,2)
 \end{itemize}
 \end{block}
@@ -426,11 +439,10 @@ An unconstrained problem with the Lagrange multipliers for minimization $\min_{\
                     domain=-2:2,
                     view={-50}{20}
                 ]
-        \addplot3 [surf, opacity=.3, samples=50] {f(x,y)};
-        \addplot3 [mesh,red, opacity=.1, samples=50] {g(x,y)};
+       	\addplot3 [surf, opacity=.3, samples=50] {f(x,y)};
+       	\addplot3 [mesh,red, opacity=.1, samples=50] {g(x,y)};
 		\addplot3 [samples=50,mark=none, contour gnuplot={labels=false,levels={5},handler/.style={only marks}}] {g(x,y)};
-		%\addplot3 [samples=50,mark=none, contour gnuplot={labels=false,levels={5},handler/.style={only marks}}] {(x+1)^2+(y-1)^2};
-		 \addplot3[black] table[x index=0, y index=1, z expr={f(x,y)}] {dm_svm_contourtmp0.table};
+		\addplot3[black] table[x index=0, y index=1, z expr={f(x,y)}] {dm_svm_contourtmp0.table};
     \end{axis}
 \end{tikzpicture}
 \end{frame}
