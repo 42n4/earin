@@ -329,7 +329,7 @@ new_row <-                                  # a new row
   data.frame(
     pacjent_id = 5,
     age = 10,
-    type = 'Typ3',
+    type = 'Type3',
     state = 'Excellent'
   )
 patient <- rbind(patient, new_row)          # RBIND adds a new row to the dataframe
