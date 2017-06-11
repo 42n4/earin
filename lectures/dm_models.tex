@@ -1,9 +1,11 @@
-\RequirePackage{atbegshi} 
-\documentclass{beamer}
+%lualatex --shell-escape  <name>.tex; 
+%view <name>.pdf
+%\documentclass[smaller, proffesionalfonts]{beamer}
+\documentclass[proffesionalfonts]{beamer}
 \usecolortheme[named=gray]{structure}
 \mode<presentation> {
 %\usetheme{Madrid} % My favorite!
-%\usetheme{Boadilla} % Pretty neat, soft color.
+%\usetheme{Boadilla} % Tretty neat, soft color.
 %\usetheme{default}
 \usetheme{Warsaw}
 %\usetheme{Bergen} % This template has nagivation on the left
@@ -19,15 +21,42 @@
 }
 
 \usepackage{ifpdf}
-%\usepackage{graphicx}
+\usepackage{ifluatex}
+\ifluatex
+\usepackage{polyglossia}   
+\setmainlanguage{polish}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\def\bm{\boldsymbol}
+\usepackage{lualatex-math}
+\else
+\usepackage{graphicx}
 \usepackage{polski} 
 \usepackage[utf8x]{inputenc}
+\usepackage{bm} 
+\fi
 \usepackage{ucs}
 \usepackage{listings}
 \usepackage{hyperref}
-
-%\usepackage{bm} 
+\usepackage{ragged2e}
+%\apptocmd{\frame}{}{\justifying}{} % Allow optional arguments after frame.
+%\apptocmd{\block}{}{\justifying}{} % Allow optional arguments after frame.
 % For typesetting bold math (not \mathbold)
+
+\usepackage{pgf,tikz}
+\usetikzlibrary{graphdrawing}
+\usetikzlibrary{graphs}
+\usegdlibrary{trees}
+\usetikzlibrary{intersections}
+\usetikzlibrary{arrows,shapes,automata,positioning,calc}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+%\usepackage[active,tightpage,pdftex]{preview}
+%\PreviewEnvironment{tikzpicture}
+\newcommand{\mycircle}[1]{\tikz{\filldraw[draw=#1,fill=#1] (0,0) circle [radius=0.3em];}}
+\DeclareMathOperator{\sgn}{sign}
+\usepackage{tkz-euclide}
+
 %\logo{\includegraphics[height=0.6cm]{yourlogo.eps}}
 %
 \title[EARIN]{Data Mining Lectures - Models, Model Ensembles}
@@ -232,9 +261,8 @@ Institute of Computer Science\\
 \begin{itemize}
 \item Bagging combined with algorithm randomization for increased base model diversity.
 \item Randomized decision trees sample attributes at each node prior to split selection.
-\item Ensemble prediction by voting.
+\item Ensemble prediction by voting and substantial prediction improvement.
 \item Maximum or near-maximum fit of base models individual overfitting gets compensated by combining many randomized trees.
-\item Substantial prediction improvement.
 \item Estimate prediction quality using OOB (Out-of-bag) instances.
 \item For each training instance: generate and combine predictions of those and only those trees for which the instance is OOB
 \item Use these predictions to calculate the misclassification error (or another prediction quality indicator).
@@ -245,8 +273,8 @@ Institute of Computer Science\\
 
 \begin{frame}
 \small
-\frametitle{Case study}
-\begin{block}{Data preparation}
+\frametitle{Case study: data preparation}
+\begin{block}{}
 \begin{itemize}
 \item Attributes not related to the class target have to be removed.
 \item Attributes with too many missing values (NA) may be removed or go through imputation - filling missing values with means or medians for continuous attributes or with modes (most frequent values) for discrete ones.

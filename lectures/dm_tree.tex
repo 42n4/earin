@@ -102,13 +102,11 @@ Institute of Computer Science\\
 \newcommand{\listingsfont}{\ttfamily}
 
 
-
 \begin{frame}
 \titlepage
 \end{frame}
 
 \begin{frame}
-\small
 \frametitle{Decision trees}
 \begin{block}{}
 \begin{itemize}
@@ -546,6 +544,40 @@ For each value of probability treated as a threshold for being the positive clas
 The default optimal operating point is for the threshold equal to 0.5, but it is often not the best point.
 \item
 Moving along the ROC curve shifting the operating point is possible by changing the mentioned threshold.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\scriptsize
+\frametitle{ROC curve}
+   \begin{tabular}{||r||c|c|c|c|c|c|c|c|c|c||}
+   \hline \hline
+   Real classes & 1 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+   \hline
+   Predicted classes & 1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+   \hline
+   Probs of positives & 0.9 & 0.9 & 0.6 & 0.6 & 0.6 & 0.3 & 0.3 & 0.1 & 0.1 & 0.1 \\
+   \hline \hline
+   \end{tabular}
+\begin{block}{}
+\begin{itemize}
+\item In order to draw the ROC curve you forget about predicted classes and assume that probabilities are only for positive classes. Probabilities should be sorted in descending order and assigned to them classes from training set will determine its true positive or false positive nature. 
+\item 
+At the beginning of counting it should be assumed that all negative instances are true negatives $TN$ and all positive instances are false negatives $FN$, true positives $TP$ and false positives $FP$ are equal to $0$.
+\item 
+For the same probability level: 
+\begin{itemize}
+\scriptsize
+\item
+for each such within that level probability with the assigned positive training class the true positive number $TP$ is incremented and the false negative number $FN$ is decremented.
+\item
+for each such within that level probability with the assigned negative training class the false positive number $FP$ is incremented and the true negative number $TN$ is decremented.
+\item 
+At the end the true positive rate $tpr=\frac{TP}{TP+FN}$ and the false positive rate $fpr=\frac{FP}{TN+FP}$ should be computed and will become the new ROC point parameters.
+\end{itemize}
+\item
+Thus, for each probability level the new ROC point will be obtained and all points joint by lines together will form the ROC curve to measure our classifier efficiency. 
 \end{itemize}
 \end{block}
 \end{frame}
