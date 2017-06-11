@@ -293,6 +293,50 @@ $\displaystyle $
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Knowledge retrieval from market baskets}
+\small
+\begin{block}{}
+\begin{itemize}
+\item
+Shop clients buy products in sets called baskets. Each transaction is seen as a set of items. Products are numbered from 1 to $M$, where $M$ is a number of all products e.g.:\\
+(1 2)\ 
+(1 2 3)\
+(1 2)\
+(1)\
+(1 2 3)
+\item
+If the given set is the subset of at least the arbitrary number (called a threshold) of transactions then it is statistically significant and remains in use and is called "frequent" e.g.
+$\displaystyle \frac{|P_{(1\ 2)}|}{N} > 20\%$, where $|P_{(1\ 2)}|$ is a number of transactions with products no 1 and 2, $N$ is the all transactions amount.
+\item
+First the one-item frequent subsets are chosen. From them two-item subsets are created and analysed. Those ones which appear sufficiently often in the transactions remain and are called "frequent". From the frequent one-item and two-item subsets the three-item subsets are created and selected and so on while frequent elements apear.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\small
+\frametitle{Knowledge retrieval from market baskets}
+\begin{block}{}
+\begin{itemize}
+\item Frequent subsets from our transactions:\\
+$\displaystyle \frac{|P_{(1)}|}{N}=1 > 20\%$,
+$\displaystyle \frac{|P_{(1\ 2)}|}{N}=\frac{4}{5} > 20\%$,
+$\displaystyle \frac{|P_{(1\ 2\ 3)}|}{N}=\frac{2}{5} > 20\%$.
+\item
+Next from frequent subsets (1), (1 2), (1 2 3) association rules are assembled. They help to discover relationships betweem seemingly unrelated data:
+$(1) \rightarrow (1\ 2)-(1)$
+\item
+To the premise part of the rule the frequent subset was chosen and to the conclusion part of the same rule the bigger frequent subset containing (association) the former premise subset was attached, but from a rule \arit{modus ponens} ($\displaystyle \frac{a,a\Rightarrow b}{b}$) results that conclusion containing premises is not permitted, so they are substracted from conclusion. In such a way the association rule is obtained: \\
+$(1)\rightarrow(2)$
+\item
+Another rule generated in the same way:\\
+$(1\ 2)\rightarrow (1\ 2\ 3) - (1\ 2)$\\
+$(1\ 2)\rightarrow (3)$\\
+\end{itemize}
+\end{block}
+\end{frame}
+
 \end{document}
 
 \begin{frame}
