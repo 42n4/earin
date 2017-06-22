@@ -26,6 +26,11 @@ library(pROC)				  # plot the ROC curve
 library(xgboost) 
 library(doParallel)
 
+##########################################################################################################
+#My functions
+##########################################################################################################
+
+
 #function removes columns with zero data
 remove_colzero<-function(df_test){
   df_test[,colSums (df_test^2)!=0]
@@ -74,7 +79,7 @@ get_time<-function(){
   time.taken
 }
 
-#df_test<-magic1
+#significant columns
 columns_boosted<-function(df_test){
   library(gbm)
   #http://www.rmdk.ca/boosting_forests_bagging.html
@@ -87,12 +92,17 @@ columns_boosted<-function(df_test){
   names_chosen
 }
 
+#Mode the frequent attribute values
 Mode <- function (x, na.rm) {
   xtab <- table(x)
   xmode <- names(which(xtab == max(xtab)))
   if (length(xmode) > 1) xmode <- ">1 mode"
   return(xmode)
 }
+
+##########################################################################################################
+##########################################################################################################
+
 
 #data description
 #http://archive.ics.uci.edu/ml/machine-learning-databases/magic/magic04.names
