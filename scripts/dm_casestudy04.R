@@ -196,32 +196,7 @@ get_time()
 #3 plots in two column
 dev.off(); par(mfrow = c(3, 2))
 #rpart works with weigths or priors  - prior probabilities of output class classes: sum(priors)=1
-#modelrpart <- rpart(class~., data = ci.train, weights=weights)
-modelrpart <- rpart(class~., data = ci.train, parms = list(prior = c(ProbC, 1 - ProbC)))
-#prp(modelrpart)
-printcp(modelrpart)
-ci.train.rpart.cm <- get_cm(modelrpart,ci.val)
-ci.train.rpart.cm
-ci.train.rpart.roc <- show_roc(modelrpart,ci.val,"ROC rpart")
-
-get_time()
-
-##########################################################################################################
-#rpart works also with priors - prior probabilities of output class classes: sum(priors)=1
 #maximum size of tree with minsplit=2, cp=0 and priors
-modelrpartmax <- rpart(class~., 
-                       data = ci.train,
-                       parms = list(prior = c(ProbC, 1 - ProbC)),
-                       minsplit=10, 
-                       cp=0.001
-)# decision trees // ROC
-#prp(modelrpartmax)
-#printcp(modelrpartmax)
-ci.train.rpartmax.cm <- get_cm(modelrpartmax,ci.val)
-ci.train.rpartmax.cm
-ci.train.rpartmax.roc <- show_roc(modelrpartmax,ci.val,"ROC for max rpart")
-
-get_time()
 
 ##########################################################################################################
 #read about caret package, use boosting, bagging, k-fold crossvalidating
@@ -253,7 +228,7 @@ caretrpart <- train(method = 'rpart2',
 ci.train.caretrpart.cm <- get_cm(caretrpart,ci.val,"raw")
 ci.train.caretrpart.cm
 ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val, "ROC caret rpart2")
-
+dmr.claseval::auc(ci.train.caretrpart.roc)
 
 get_time()
 
@@ -274,6 +249,7 @@ library("partykit")
 ci.train.caretctree.cm <- get_cm(caretctree,ci.val,"raw")
 ci.train.caretctree.cm
 ci.train.caretctree.roc <- show_roc(caretctree,ci.val, "ROC caret ctree")
+dmr.claseval::auc(ci.train.caretctree.roc)
 
 get_time()
 
@@ -289,6 +265,7 @@ caretlda <- train(method = 'lda',
 ci.train.caretlda.cm <- get_cm(caretlda,ci.val,"raw")
 ci.train.caretlda.cm
 ci.train.caretlda.roc <- show_roc(caretlda,ci.val, "ROC caret lda")
+dmr.claseval::auc(ci.train.caretlda.roc)
 
 get_time()
 
@@ -312,24 +289,47 @@ caretgbm$bestTune
 ci.train.caretgbm.cm <- get_cm(caretgbm,ci.val,"raw")
 ci.train.caretgbm.cm
 ci.train.caretgbm.roc <- show_roc(caretgbm,ci.val, "ROC caret gbm")
+ci.train.caretgbm.cm
+
 get_time()
 
-ci.train.rpart.cm
-ci.train.rpartmax.cm
+
+##########################################################################################################
+caretreebag <- NULL
+caretreebag <- train(method = 'treebag', 
+                     x = ci.train[,-ncol(ci.train)], 
+                     y = ci.train[,ncol(ci.train)]
+                     #,parms = list(prior = c(ProbC, 1 - ProbC))
+                     #,tuneGrid=grid
+                     #, metric="ROC"
+                     ,weights=weights100
+                     ,trControl = ctrl
+                     #,verbose=FALSE
+)
+ci.train.caretreebag.cm <- get_cm(caretreebag,ci.val,"raw")
+ci.train.caretreebag.cm
+ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val, "ROC caret treebag")
+dmr.claseval::auc(ci.train.caretreebag.roc)
+
+get_time()
+
+##########################################################################################################
+
 ci.train.caretrpart.cm
 ci.train.caretctree.cm
 ci.train.caretlda.cm
 ci.train.caretgbm.cm
+ci.train.caretreebag.cm
 
-dmr.claseval::auc(ci.train.rpart.roc)
-dmr.claseval::auc(ci.train.rpartmax.roc)
 dmr.claseval::auc(ci.train.caretrpart.roc)
 dmr.claseval::auc(ci.train.caretctree.roc)
 dmr.claseval::auc(ci.train.caretlda.roc)
 dmr.claseval::auc(ci.train.caretgbm.roc)
+dmr.claseval::auc(ci.train.caretreebag.roc)
+
 get_time()
 
-results <- resamples(list(CRP=caretrpart, CCT=caretctree, CLD=caretlda, CGB=caretgbm))
+results <- resamples(list(CRP=caretrpart, CCT=caretctree, CLD=caretlda, CGB=caretgbm, CTB=caretreebag))
 # summarize the distributions
 summary(results)
 Sys.sleep(5)                                # 5 second pause
@@ -340,24 +340,22 @@ parallelplot(results)
 Sys.sleep(5)                                # 5 second pause
 
 ##########################################################################################################
-
+#again for unbalanced data
+#3 plots in two column
+dev.off(); par(mfrow = c(3, 2))
 rci1 <- runif(nrow(magic2))
 ci.train1 <- magic2[rci1>=0.33,]
 ci.val1 <- magic2[rci1<0.33,]
-ci.train.rpart.roc <- show_roc(modelrpart,ci.val1,"ROC rpart")
-ci.train.rpartmax.roc <- show_roc(modelrpartmax,ci.val1,"ROC for max rpart")
 ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val1, "ROC caret rpart2")
 ci.train.caretctree.roc <- show_roc(caretctree,ci.val1, "ROC caret ctree")
 ci.train.caretlda.roc <- show_roc(caretlda,ci.val1, "ROC caret lda")
 ci.train.caretgbm.roc <- show_roc(caretgbm,ci.val1, "ROC caret gbm")
+ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 
 
-
-#http://bigcomputing.blogspot.com/2014/10/an-example-of-using-random-forest-in.html
-#http://www.rmdk.ca/boosting_forests_bagging.html
 
 ##########################################################################################################
-#BELOW tests for caret classifier models: for random chosen rows of bigger data and for this data
+#BELOW tests for caret classifier models: for several thousand of random chosen rows from bigger data
 #failed (maybe you will succeded: rda, rpartScore, rpartCost, rpart2, ctree, xgbTree
 #time consuming: cforest, adaboost
 #succeded: ctree2, gbm, treebag
@@ -390,26 +388,7 @@ caretmodel <- train(method = 'treebag',
 )
 ci.train.caretmodel.cm <- get_cm(caretmodel,ci.val,"raw")
 ci.train.caretmodel.cm
-ci.train.caretmodel.roc <- show_roc(caretmodel,ci.val, "ROC caret")
-dmr.claseval::auc(ci.train.caretmodel.roc)
-get_time()
-
-
-##########################################################################################################
-caretmodel <- NULL
-caretmodel <- train(method = 'treebag', 
-                    x = ci.train[,-ncol(ci.train)], 
-                    y = ci.train[,ncol(ci.train)]
-                    #,parms = list(prior = c(ProbC, 1 - ProbC))
-                    #,tuneGrid=grid
-                    #, metric="ROC"
-                    ,weights=weights100
-                    ,trControl = ctrl
-                    #,verbose=FALSE
-)
-ci.train.caretmodel.cm <- get_cm(caretmodel,ci.val,"raw")
-ci.train.caretmodel.cm
-ci.train.caretmodel.roc <- show_roc(caretmodel,ci.val, "ROC caret")
+ci.train.caretmodel.roc <- show_roc(caretmodel,ci.val, "ROC caret test model")
 dmr.claseval::auc(ci.train.caretmodel.roc)
 get_time()
 
