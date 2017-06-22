@@ -1,19 +1,28 @@
 start.time <- Sys.time()
-#http://www.wekaleamstudios.co.uk/supplementary-material/
-#http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
-#http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
-#getModelInfo(model = "rpart", regex = FALSE)[[1]]
+#For students with some doubts about the suggested caret solution, 
+#I prepared the exemplary case study only with a use of caret - a wrapper of many classifiers and not only:
+#https://github.com/pwasiewi/earin/blob/master/scripts/dm_casestudy04.R
+#https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy04.R
+#Try to modify some parameters e.g. in a train function:tuneLength,metric,preProc and so on.
+#For your data try also other classifiers from site:
+#http://topepo.github.io/caret/train-models-by-tag.html
+#Their parameters mentioned in their descriptions are automatically estimated 
+#(in default grid tunes) e.g. with the repeated kfold crossvalidation in the exemplary script.
 #rpart works with weights or priors for unbalanced classes
-#try different values of weights or priors and minsplit and cp, try to shift working point with cutclass to get better results
+#http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
+#try different values of weights or priors and minsplit and cp, 
+#try to shift working point with cutclass to get better results
 #try other classifiers with priors or weights for class classes
 #at the end compare all roc curves of all used classifiers
 #some other measures are mentioned here:
 #https://geekoverdose.wordpress.com/2014/07/25/svm-classification-example-with-performance-measures-using-r-caret/
+#
+#http://www.wekaleamstudios.co.uk/supplementary-material/
+#http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
 
-library(dmr.claseval)
+library(dmr.claseval) #dmr from the Cichosz book "Data mining: explained in R" 
 library(dmr.util)
-library(dmr.trans)
-
+library(dmr.trans)    
 library(rpart)
 library(rpart.plot)
 library(randomForest)
@@ -270,16 +279,16 @@ dmr.claseval::auc(ci.train.caretlda.roc)
 get_time()
 
 ##########################################################################################################
-grid <- expand.grid(interaction.depth=c(1,2,3), # Depth of variable interactions
+grid <- expand.grid(interaction.depth=c(1,2,3),     # Depth of variable interactions
                     n.trees=c(140,150,160),	        # Num trees to fit
-                    shrinkage=c(0.01,0.1),		# Try 2 values for learning rate 
+                    shrinkage=c(0.01,0.1),		      # Try 2 values for learning rate 
                     n.minobsinnode = c(10,20))
 caretgbm <- NULL
 caretgbm <- train(method = 'gbm', 
                   x = ci.train[,-ncol(ci.train)], 
                   y = ci.train[,ncol(ci.train)]
                   #,parms = list(prior = c(ProbC, 1 - ProbC))
-                  #,tuneGrid=grid #usually do it automatically without grid
+                  #,tuneGrid=grid #usually do it automatically with a default grid
                   ,weights=weights100
                   ,trControl = ctrl
                   ,verbose=FALSE
