@@ -20,6 +20,12 @@ start.time <- Sys.time()
 #http://www.wekaleamstudios.co.uk/supplementary-material/
 #http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
 
+dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats',
+              'dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim','dmr.dectree',
+              'dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree',
+              'dmr.attrsel','dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus',
+              'dmr.miscost','dmr.rpartutil')
+#install_github(paste("42n4/", dmrpkglist, sep=""),force = TRUE)
 library(dmr.claseval) #dmr from the Cichosz book "Data mining: explained in R" 
 library(dmr.util)
 library(dmr.trans)    
