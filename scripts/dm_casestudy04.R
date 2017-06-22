@@ -371,9 +371,9 @@ ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 
 ##########################################################################################################
 #BELOW tests for caret classifier models: for several thousand of random chosen rows from bigger data
-#failed (maybe you will succeded: rda, rpartScore, rpartCost, rpart2, ctree, xgbTree
+#failed (maybe you will succeed): rda, rpartScore, rpartCost, ctree, xgbTree
 #time consuming: cforest, adaboost
-#succeded: ctree2, gbm, treebag
+#succeded: rpart2, ctree2, gbm, treebag
 ##########################################################################################################
 
 library(doParallel)
