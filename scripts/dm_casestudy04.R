@@ -117,7 +117,9 @@ Mode <- function (x, na.rm) {
 
 ##########################################################################################################
 ##########################################################################################################
-
+# Set up to do parallel processing   
+registerDoParallel(4)		# Register a parallel backend for train
+getDoParWorkers()
 
 #data description
 #http://archive.ics.uci.edu/ml/machine-learning-databases/magic/magic04.names
@@ -176,7 +178,7 @@ table(magic2$class)
 table(magic3$class)
 
 #return of unbalanced data
-#magic3<-magic2
+magic3<-magic2
 
 get_time()
 
@@ -199,9 +201,7 @@ weights100 <- round(weights*100,0)
 table(weights100)
 
 ##########################################################################################################
-# Set up to do parallel processing   
-registerDoParallel(4)		# Register a parallel backend for train
-getDoParWorkers()
+
 ProbC=as.numeric(table(ci.train$class)[2]/nrow(ci.train))
 ProbC=1-ifelse(ProbC<0.2, 0.2, ProbC)
 
@@ -216,7 +216,7 @@ dev.off(); par(mfrow = c(3, 2))
 ##########################################################################################################
 #read about caret package, use boosting, bagging, k-fold crossvalidating
 ctrl <- trainControl(method = "repeatedcv"
-                     , number = 10
+                     , number = 3
                      , repeats = 3
                      , classProbs = TRUE
                      , allowParallel=TRUE
@@ -379,10 +379,10 @@ ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 library(doParallel)
 # Set up to do parallel processing   
 #registerDoParallel(4)		# Registrer a parallel backend for train
-registerDoParallel(4,cores=4)
+registerDoParallel(2,cores=2)
 getDoParWorkers()
 ctrl <- trainControl(method = "repeatedcv"
-                     , number = 10
+                     , number = 3
                      , repeats = 3
                      , classProbs = TRUE
                      , allowParallel=TRUE
@@ -391,12 +391,15 @@ ctrl <- trainControl(method = "repeatedcv"
 nrow(ci.train)
 get_time()
 caretmodel <- NULL
+set.seed(12345)
 rci2 <- runif(nrow(ci.train))
+TH<-0.05
+table(ci.train[rci2<TH,ncol(ci.train)])
 caretmodel <- train(method = 'treebag', 
-                    x = ci.train[rci2<0.2,-ncol(ci.train)], 
-                    y = ci.train[rci2<0.2,ncol(ci.train)]
+                    x = ci.train[rci2<TH,-ncol(ci.train)], 
+                    y = ci.train[rci2<TH,ncol(ci.train)]
                     #,parms = list(prior = c(ProbC, 1 - ProbC))
-                    ,weights=weights100[rci2<0.2]
+                    ,weights=weights100[rci2<TH]
                     #,preProcess = c('center', 'scale')
                     #, metric="ROC"
                     ,trControl = ctrl
