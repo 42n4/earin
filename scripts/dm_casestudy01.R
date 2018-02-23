@@ -1,11 +1,14 @@
+#after pulling new docker 42n4/rstudio run this command
+#.rs.restartR()
 #http://www.wekaleamstudios.co.uk/supplementary-material/
-library(dmr.claseval)
-library(dmr.util)
-library(dmr.trans)
-
 library(rpart)
 library(rpart.plot)
 library(randomForest)
+library(dmr.util)
+library(dmr.trans)
+library(dmr.claseval)
+library(dmr.rpartutil)
+
 #https://kdd.ics.uci.edu/databases/census-income/census-income.html
 census <- read.table("./census-income.data",
                      sep=",", na.strings="?", strip.white=TRUE)

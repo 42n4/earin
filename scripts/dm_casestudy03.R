@@ -1,3 +1,5 @@
+#after pulling new docker 42n4/rstudio run this command
+#.rs.restartR()
 ##############
 #20-4.R
 ##############
@@ -5,11 +7,11 @@ library(rpart)
 library(rpart.plot)
 library(randomForest)
 library(cluster)
-
-library(dmr.claseval)
-library(dmr.cluseval)
-library(dmr.trans)
 library(dmr.util)
+library(dmr.trans)
+library(dmr.cluseval)
+library(dmr.claseval)
+library(dmr.rpartutil)
 
 #https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/
 

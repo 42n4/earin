@@ -1,3 +1,5 @@
+#after pulling new docker 42n4/rstudio run this command
+#.rs.restartR()
 start.time <- Sys.time()
 #For students with some doubts about the suggested caret solution, 
 #I prepared the exemplary case study only with a use of caret - a wrapper of many classifiers and not only:
@@ -14,17 +16,16 @@ start.time <- Sys.time()
 #try to shift working point with cutclass to get better results
 #try other classifiers with priors or weights for class classes
 #at the end compare all roc curves of all used classifiers
+#e.g. https://rpubs.com/chengjiun/52658
 #some other measures are mentioned here:
 #https://geekoverdose.wordpress.com/2014/07/25/svm-classification-example-with-performance-measures-using-r-caret/
 #
 #http://www.wekaleamstudios.co.uk/supplementary-material/
 #http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
 
-dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats',
-              'dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim','dmr.dectree',
-              'dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree',
-              'dmr.attrsel','dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus',
-              'dmr.miscost','dmr.rpartutil')
+dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats','dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim',
+              'dmr.dectree','dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree','dmr.attrsel',
+              'dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus','dmr.miscost','dmr.rpartutil')
 #install_github(paste("42n4/", dmrpkglist, sep=""),force = TRUE)
 library(dmr.claseval) #dmr from the Cichosz book "Data mining: explained in R" 
 library(dmr.util)
@@ -39,6 +40,10 @@ library(dplyr)        # Used by caret
 library(gbm)				  # GBM Models
 library(pROC)				  # plot the ROC curve
 library(xgboost) 
+library(doParallel)
+library(gbm)
+library(party)
+library(partykit)
 library(doParallel)
 
 ##########################################################################################################
@@ -96,7 +101,7 @@ get_time<-function(){
 
 #significant columns
 columns_boosted<-function(df_test){
-  library(gbm)
+  
   #http://www.rmdk.ca/boosting_forests_bagging.html
   boost <<- gbm(as.formula(paste(names(df_test)[ncol(df_test)],"~.",sep="")), data=df_test, 
                 distribution = 'gaussian', #for multi class classs
@@ -259,7 +264,7 @@ caretctree <- train(method = 'ctree2',
                     ,trControl = ctrl
 )
 #https://stats.stackexchange.com/questions/171301/interpreting-ctree-partykit-output-in-r
-library("partykit")
+
 #plot(caretctree,type="simple")
 ci.train.caretctree.cm <- get_cm(caretctree,ci.val,"raw")
 ci.train.caretctree.cm
@@ -371,15 +376,20 @@ ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 
 ##########################################################################################################
 #BELOW tests for caret classifier models: for several thousand of random chosen rows from bigger data
-#failed (maybe you will succeed): rda, rpartScore, rpartCost, ctree, xgbTree
+
+#failed (maybe you will succeed): rda, rpartScore, rpartCost, ctree, xgbTree, blackboost
+#deepboost
 #time consuming: cforest, adaboost
-#succeded: rpart2, ctree2, gbm, treebag
+#succeded: rpart2, ctree2, gbm, treebag, LogitBoost, rotationForest, rotationForestCp
+#glmboost
+#642 rows TH=0.05: adaboost, AdaBoost.M1, AdaBag, ada, ORFsvm, evtree, nodeHarvest,
+#
 ##########################################################################################################
 
-library(doParallel)
+
 # Set up to do parallel processing   
-#registerDoParallel(4)		# Registrer a parallel backend for train
-registerDoParallel(2,cores=2)
+#registerDoParallel(4)		# Register a parallel backend for train
+registerDoParallel(3,cores=3)
 getDoParWorkers()
 ctrl <- trainControl(method = "repeatedcv"
                      , number = 3
@@ -393,9 +403,9 @@ get_time()
 caretmodel <- NULL
 set.seed(12345)
 rci2 <- runif(nrow(ci.train))
-TH<-0.05
+TH<-0.005
 table(ci.train[rci2<TH,ncol(ci.train)])
-caretmodel <- train(method = 'treebag', 
+caretmodel <- train(method = 'glmboost', 
                     x = ci.train[rci2<TH,-ncol(ci.train)], 
                     y = ci.train[rci2<TH,ncol(ci.train)]
                     #,parms = list(prior = c(ProbC, 1 - ProbC))
@@ -404,9 +414,9 @@ caretmodel <- train(method = 'treebag',
                     #, metric="ROC"
                     ,trControl = ctrl
 )
-ci.train.caretmodel.cm <- get_cm(caretmodel,ci.val,"raw")
+ci.train.caretmodel.cm <- get_cm(caretmodel,ci.val1,"raw")
 ci.train.caretmodel.cm
-ci.train.caretmodel.roc <- show_roc(caretmodel,ci.val, "ROC caret test model")
+ci.train.caretmodel.roc <- show_roc(caretmodel,ci.val1, "ROC caret test model")
 dmr.claseval::auc(ci.train.caretmodel.roc)
 get_time()
 
