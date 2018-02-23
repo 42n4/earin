@@ -1,10 +1,12 @@
+#after pulling new docker 42n4/rstudio run this command
+#.rs.restartR()
 ##############
 #20-3.R
 ##############
-library(dmr.regeval)
 library(dmr.util)
 library(dmr.trans)
-
+library(dmr.regeval)
+library(dmr.rpartutil)
 library(rpart)
 library(rpart.plot)
 library(randomForest)
