@@ -1,17 +1,62 @@
-### For building in a new folder with a Dockerfile in it (you can add your packages to it)
+## M$ RevoScaleR Rstudio Docker with libraries and scripts of Cichosz book: https://www.amazon.com/Data-Mining-Algorithms-Explained-Using/dp/111833258X and my lectures of data mining
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/42n4/rstudio.svg)](https://hub.docker.com/r/42n4/rstudio/)
+[![Docker Stars](https://img.shields.io/docker/stars/42n4/rstudio.svg)](https://hub.docker.com/r/42n4/rstudio/)
+
+### You can pull my docker with all R packages (about 1h with a good internet connection)
+
+docker pull 42n4/rstudio   #pull my docker (about 7G in tar)
+
+### or make it in three steps (about 1 hour on i7) - you can add your packages to Dockerfile:
+#### 1
+git clone https://github.com/pwasiewi/dokerz.git
+cd dokerz/r-ml
+
+docker build --rm -t 42n4/r-ml .
+#### 2
+cd ../rstudio-ml
+
+docker build --rm -t 42n4/rstudio-ml .
+#### 3
+cd ../rstudio
 
 docker build --rm -t 42n4/rstudio .
 
-https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image
+docker login 				#docker-hub-user-login and pass to hub.docker.com
 
-https://github.com/rocker-org/rocker-versioned/tree/master/rstudio
+docker push 42n4/rstudio 	#send to docker-hub-user/docker-name
 
-### Start the docker in Linux with exact username and its user id and group id (login: guest pass: rstudio)
+### Docker offline copy
+docker save 42n4/rstudio > ~/docker42n4.tar 
 
-docker run -d -p 8787:8787 --name=rstudio -e USER=guest -e USERID=1001 -e GROUPID=100 -v $(pwd):/home/guest 42n4/rstudio
+docker load < ~/docker42n4.tar
+
+### Install 7zip. Unpack all data in a directory data with 8x from a directory bin. 
+#### execute in a directory data: 
+
+cd data; 
+
+sh AirOnTime87to12.xdf.sh 
+
+../bin/8x census-income.tar.7z
+
+../bin/8x covandcommunities.tar.7z
+
+../bin/8x retailchurn.tar.7z
+
+cd ..
+
+## Start the docker in Linux with exact username and its user id and group id (login: guest pass: rstudio)
+
+docker run -d -p 8787:8787 --name=rstudio -e USER=`whoami` -e USERID=$(id -u) -e GROUPID=$(id -g) -v $(pwd):/home/`whoami` 42n4/rstudio
+
+#### If you want the opencl support for AMD, you need to install amd drivers and add '-v /sys/dev:/sys/dev --device=/dev/dri  --device=/dev/kfd' to the docker command:
+docker run -d -p 8787:8787 -v /sys/dev:/sys/dev --device=/dev/dri  --device=/dev/kfd -e USERID=$(id -u) -e GROUPID=$(id -g) -e USER=`whoami` -v $(pwd):/home/`whoami` --name=rstudio 42n4/rstudio
+
+#### If you want the opencl support for NVIDIA, you need to install nvidia-docker2 package from the NVidia PPA (https://github.com/NVIDIA/nvidia-docker) and add '--runtime=nvidia' to the docker command.
 
 ### Start the docker in MSWindows (Docker for Windows) with Linux containers enabled and Powershell and shared disk c: in docker settings (login: rstudio pass: rstudio)
-https://github.com/pwasiewi/dokerz/blob/master/rstudio/linux_docker_in_windows10.png
+![Screen](https://github.com/pwasiewi/dokerz/raw/master/rstudio/linux_docker_in_windows10.png)
 
 docker run -d -p 8787:8787 --name=rstudio --restart=always -v c:/Users/Piotr/remote:/home/rstudio 42n4/rstudio
 
@@ -32,13 +77,20 @@ dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All
 ##### https://coderwall.com/p/2rpbba/docker-create-a-bridge-and-shared-network
 
 ### Run bash in the docker
+docker run -it 42n4/rstudio /bin/bash
 
+### Run bash in the active docker
 docker exec -it rstudio /bin/bash
 
-### Update the docker
-
+### Get or update the docker
 docker pull 42n4/rstudio
 
-### Stop the running docker
+### Stop and remove the running docker
+docker rm -f rstudio
 
-docker rm rstudio -f
+### or just use
+bin/docker_remove
+
+### After building a docker clean your hd from unwanted temporary image layers
+bin/docker_clean
+
