@@ -1,18 +1,40 @@
+################################################################################
+# Casestudy from the Cichosz book "Data mining: explained in R" 
+################################################################################
 #after pulling new docker 42n4/rstudio run this command
 #.rs.restartR()
 #http://www.wekaleamstudios.co.uk/supplementary-material/
-library(rpart)
-library(rpart.plot)
-library(randomForest)
-library(dmr.util)
-library(dmr.trans)
-library(dmr.claseval)
-library(dmr.rpartutil)
+
+# Install all packages from Cichosz book "Data mining: explained in R" 
+dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats','dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim',
+              'dmr.dectree','dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree','dmr.attrsel',
+              'dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus','dmr.miscost','dmr.rpartutil')
+pkgcheck <- dmrpkglist %in% row.names(installed.packages())
+dmrpkglist[!pkgcheck]
+for(i in dmrpkglist[!pkgcheck]){install_github(paste("42n4/", i, sep=""),force = TRUE)}
+dmrpkglist<-c("dmr.util",
+              "dmr.trans",
+              "dmr.claseval",
+              "dmr.rpartutil")
+for(i in dmrpkglist) library(i, character.only = TRUE);
+
+pkglist<-c("rpart",
+           "rpart.plot",
+           "randomForest")
+pkgcheck <- pkglist %in% row.names(installed.packages())
+pkglist[!pkgcheck]
+#COMMMENT the line below if you installed packages earlier e.g on root
+for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
+#this command is for root instalation of missing packages:
+if(length(pkglist[!pkgcheck])) cat("install.packages(c(");j=0; for(i in pkglist[!pkgcheck]) { j<-j+1 ;  if(j == length(pkglist[!pkgcheck])) cat(paste('"',i,'"',sep="")) else cat(paste('"',i,'",',sep=""));} ; cat("),depend=TRUE)")
+#loading all libraries - necessary to avoid errors of execution
+for(i in pkglist) library(i, character.only = TRUE);
+
 
 #https://kdd.ics.uci.edu/databases/census-income/census-income.html
-census <- read.table("./census-income.data",
+census <- read.table("data/census-income.data",
                      sep=",", na.strings="?", strip.white=TRUE)
-census.test <- read.table("./census-income.test",
+census.test <- read.table("data/census-income.test",
                           sep=",", na.strings="?", strip.white=TRUE)
 names(census) <- c("age",
                    "class.of.worker",

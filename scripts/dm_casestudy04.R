@@ -1,50 +1,67 @@
-#after pulling new docker 42n4/rstudio run this command
-#.rs.restartR()
+################################################################################
+# Piotr Wasiewicz casestudy based on magic dataset
+################################################################################
+# after pulling new docker 42n4/rstudio run this command
+# .rs.restartR()
 start.time <- Sys.time()
-#For students with some doubts about the suggested caret solution, 
-#I prepared the exemplary case study only with a use of caret - a wrapper of many classifiers and not only:
-#https://github.com/pwasiewi/earin/blob/master/scripts/dm_casestudy04.R
-#https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy04.R
-#Try to modify some parameters e.g. in a train function:tuneLength,metric,preProc and so on.
-#For your data try also other classifiers from site:
-#http://topepo.github.io/caret/train-models-by-tag.html
-#Their parameters mentioned in their descriptions are automatically estimated 
-#(in default grid tunes) e.g. with the repeated kfold crossvalidation in the exemplary script.
-#rpart works with weights or priors for unbalanced classes
-#http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
-#try different values of weights or priors and minsplit and cp, 
-#try to shift working point with cutclass to get better results
-#try other classifiers with priors or weights for class classes
-#at the end compare all roc curves of all used classifiers
-#e.g. https://rpubs.com/chengjiun/52658
-#some other measures are mentioned here:
-#https://geekoverdose.wordpress.com/2014/07/25/svm-classification-example-with-performance-measures-using-r-caret/
+# For students with some doubts about the suggested caret solution, 
+# I prepared the exemplary case study only with a use of caret - a wrapper of many classifiers and not only:
+# https://github.com/pwasiewi/earin/blob/master/scripts/dm_casestudy04.R
+# https://github.com/pwasiewi/dokerz/blob/master/rstudio/dm_casestudy04.R
+# Try to modify some parameters e.g. in a train function:tuneLength,metric,preProc and so on.
+# For your data try also other classifiers from site:
+# http://topepo.github.io/caret/train-models-by-tag.html
+# Their parameters mentioned in their descriptions are automatically estimated 
+# (in default grid tunes) e.g. with the repeated kfold crossvalidation in the exemplary script.
+# rpart works with weights or priors for unbalanced classes
+# http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
+# try different values of weights or priors and minsplit and cp, 
+# try to shift working point with cutclass to get better results
+# try other classifiers with priors or weights for class classes
+# at the end compare all roc curves of all used classifiers
+# some other measures are mentioned here:
+# https://geekoverdose.wordpress.com/2014/07/25/svm-classification-example-with-performance-measures-using-r-caret/
 #
-#http://www.wekaleamstudios.co.uk/supplementary-material/
-#http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
+# http://www.wekaleamstudios.co.uk/supplementary-material/
+# http://www.r-tutor.com/taxonomy/term/286 #GPU SVM
 
+# Install all packages from Cichosz book "Data mining: explained in R" 
 dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats','dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim',
               'dmr.dectree','dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree','dmr.attrsel',
               'dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus','dmr.miscost','dmr.rpartutil')
-#install_github(paste("42n4/", dmrpkglist, sep=""),force = TRUE)
-library(dmr.claseval) #dmr from the Cichosz book "Data mining: explained in R" 
-library(dmr.util)
-library(dmr.trans)    
-library(rpart)
-library(rpart.plot)
-library(randomForest)
-library(caret)
-library(corrplot)			# plot correlations
-library(doParallel)		# parallel processing
-library(dplyr)        # Used by caret
-library(gbm)				  # GBM Models
-library(pROC)				  # plot the ROC curve
-library(xgboost) 
-library(doParallel)
-library(gbm)
-library(party)
-library(partykit)
-library(doParallel)
+pkgcheck <- dmrpkglist %in% row.names(installed.packages())
+dmrpkglist[!pkgcheck]
+for(i in dmrpkglist[!pkgcheck]){install_github(paste("42n4/", i, sep=""),force = TRUE)}
+dmrpkglist<-c("dmr.util",
+              "dmr.trans",
+              "dmr.claseval")
+for(i in dmrpkglist) library(i, character.only = TRUE);
+
+# First check to see if these packages are installed on this machine
+pkglist<-c("rpart",
+           "rpart.plot",
+           "randomForest",
+           "caret",
+           "corrplot",			
+           "doParallel",	
+           "dplyr",       
+           "gbm",				 
+           "pROC",				 
+           "xgboost", 
+           "doParallel",
+           "gbm",
+           "party",
+           "partykit",
+           "doParallel")
+pkgcheck <- pkglist %in% row.names(installed.packages())
+pkglist[!pkgcheck]
+#COMMMENT the line below if you installed packages earlier e.g on root
+for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
+#this command is for root instalation of missing packages:
+if(length(pkglist[!pkgcheck])) cat("install.packages(c(");j=0; for(i in pkglist[!pkgcheck]) { j<-j+1 ;  if(j == length(pkglist[!pkgcheck])) cat(paste('"',i,'"',sep="")) else cat(paste('"',i,'",',sep=""));} ; cat("),depend=TRUE)")
+#loading all libraries - necessary to avoid errors of execution
+for(i in pkglist) library(i, character.only = TRUE);
+
 
 ##########################################################################################################
 #My functions
@@ -227,30 +244,30 @@ ctrl <- trainControl(method = "repeatedcv"
                      , allowParallel=TRUE
                      #, summaryFunction=twoClassSummary
 )
-caretrpart <- NULL
-caretrpart <- train(method = 'rpart2', 
-                    x = ci.train[,-ncol(ci.train)], 
-                    y = ci.train[,ncol(ci.train)],           
-                    parms = list(prior = c(ProbC, 1 - ProbC))
-                    #, tuneGrid = data.frame(cp = c(0.0005669276, 0.0006669276, 0.0007669276))
-                    #, tuneGrid = data.frame(cp = seq(0.0004,0.0005,0.00001))
-                    , control = rpart.control(minsplit = 10)
-                    #,type = "Classification"
-                    #,tuneLength=10
-                    #,metric="ROC"
-                    #,preProc = c("center", "scale")
-                    #, trControl= trainControl(method="boot", number=10)
-                    ,trControl = ctrl
-)
-#plot(caretrpart)
-#summary(caretrpart)
-#prp(caretrpart$finalModel)
-ci.train.caretrpart.cm <- get_cm(caretrpart,ci.val,"raw")
-ci.train.caretrpart.cm
-ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val, "ROC caret rpart2")
-dmr.claseval::auc(ci.train.caretrpart.roc)
-
-get_time()
+# caretrpart <- NULL
+# caretrpart <- train(method = 'rpart2',
+#                     x = ci.train[,-ncol(ci.train)],
+#                     y = ci.train[,ncol(ci.train)],
+#                     parms = list(prior = c(ProbC, 1 - ProbC))
+#                     #, tuneGrid = data.frame(cp = c(0.0005669276, 0.0006669276, 0.0007669276))
+#                     #, tuneGrid = data.frame(cp = seq(0.0004,0.0005,0.00001))
+#                     , control = rpart.control(minsplit = 10)
+#                     #,type = "Classification"
+#                     #,tuneLength=10
+#                     #,metric="ROC"
+#                     #,preProc = c("center", "scale")
+#                     #, trControl= trainControl(method="boot", number=10)
+#                     #,trControl = ctrl
+# )
+# #plot(caretrpart)
+# #summary(caretrpart)
+# #prp(caretrpart$finalModel)
+# ci.train.caretrpart.cm <- get_cm(caretrpart,ci.val,"raw")
+# ci.train.caretrpart.cm
+# ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val, "ROC caret rpart2")
+# dmr.claseval::auc(ci.train.caretrpart.roc)
+# 
+# get_time()
 
 ##########################################################################################################
 #ctree only tunes over mincriterion and ctree2 tunes over maxdepth (while fixing mincriterion = 0)
@@ -274,20 +291,20 @@ dmr.claseval::auc(ci.train.caretctree.roc)
 get_time()
 
 ##########################################################################################################
-caretlda <- NULL
-caretlda <- train(method = 'lda', 
-                  x = ci.train[,-ncol(ci.train)], 
-                  y = ci.train[,ncol(ci.train)]
-                  , parms = list(prior = c(ProbC, 1 - ProbC))
-                  #, weights=weights100
-                  ,trControl = ctrl
-)
-ci.train.caretlda.cm <- get_cm(caretlda,ci.val,"raw")
-ci.train.caretlda.cm
-ci.train.caretlda.roc <- show_roc(caretlda,ci.val, "ROC caret lda")
-dmr.claseval::auc(ci.train.caretlda.roc)
-
-get_time()
+# caretlda <- NULL
+# caretlda <- train(method = 'lda', 
+#                   x = ci.train[,-ncol(ci.train)], 
+#                   y = ci.train[,ncol(ci.train)]
+#                   , parms = list(prior = c(ProbC, 1 - ProbC))
+#                   #, weights=weights100
+#                   ,trControl = ctrl
+# )
+# ci.train.caretlda.cm <- get_cm(caretlda,ci.val,"raw")
+# ci.train.caretlda.cm
+# ci.train.caretlda.roc <- show_roc(caretlda,ci.val, "ROC caret lda")
+# dmr.claseval::auc(ci.train.caretlda.roc)
+# 
+# get_time()
 
 ##########################################################################################################
 grid <- expand.grid(interaction.depth=c(1,2,3),     # Depth of variable interactions
@@ -335,21 +352,22 @@ get_time()
 
 ##########################################################################################################
 
-ci.train.caretrpart.cm
+#ci.train.caretrpart.cm
 ci.train.caretctree.cm
-ci.train.caretlda.cm
+#ci.train.caretlda.cm
 ci.train.caretgbm.cm
 ci.train.caretreebag.cm
 
-dmr.claseval::auc(ci.train.caretrpart.roc)
+#dmr.claseval::auc(ci.train.caretrpart.roc)
 dmr.claseval::auc(ci.train.caretctree.roc)
-dmr.claseval::auc(ci.train.caretlda.roc)
+#dmr.claseval::auc(ci.train.caretlda.roc)
 dmr.claseval::auc(ci.train.caretgbm.roc)
 dmr.claseval::auc(ci.train.caretreebag.roc)
 
 get_time()
 
-results <- resamples(list(CRP=caretrpart, CCT=caretctree, CLD=caretlda, CGB=caretgbm, CTB=caretreebag))
+#results <- resamples(list(CRP=caretrpart, CCT=caretctree, CLD=caretlda, CGB=caretgbm, CTB=caretreebag))
+results <- resamples(list(CCT=caretctree, CGB=caretgbm, CTB=caretreebag))
 # summarize the distributions
 summary(results)
 Sys.sleep(5)                                # 5 second pause
@@ -366,9 +384,9 @@ dev.off(); par(mfrow = c(3, 2))
 rci1 <- runif(nrow(magic2))
 ci.train1 <- magic2[rci1>=0.33,]
 ci.val1 <- magic2[rci1<0.33,]
-ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val1, "ROC caret rpart2")
+#ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val1, "ROC caret rpart2")
 ci.train.caretctree.roc <- show_roc(caretctree,ci.val1, "ROC caret ctree")
-ci.train.caretlda.roc <- show_roc(caretlda,ci.val1, "ROC caret lda")
+#ci.train.caretlda.roc <- show_roc(caretlda,ci.val1, "ROC caret lda")
 ci.train.caretgbm.roc <- show_roc(caretgbm,ci.val1, "ROC caret gbm")
 ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 
@@ -377,7 +395,7 @@ ci.train.caretreebag.roc <- show_roc(caretreebag,ci.val1, "ROC caret treebag")
 ##########################################################################################################
 #BELOW tests for caret classifier models: for several thousand of random chosen rows from bigger data
 
-#failed (maybe you will succeed): rda, rpartScore, rpartCost, ctree, xgbTree, blackboost
+#failed (maybe you will succeed): lda, rda, rpartScore, rpartCost, ctree, xgbTree, blackboost
 #deepboost
 #time consuming: cforest, adaboost
 #succeded: rpart2, ctree2, gbm, treebag, LogitBoost, rotationForest, rotationForestCp
@@ -403,9 +421,9 @@ get_time()
 caretmodel <- NULL
 set.seed(12345)
 rci2 <- runif(nrow(ci.train))
-TH<-0.005
+TH<-0.05
 table(ci.train[rci2<TH,ncol(ci.train)])
-caretmodel <- train(method = 'glmboost', 
+caretmodel <- train(method = 'adaboost', 
                     x = ci.train[rci2<TH,-ncol(ci.train)], 
                     y = ci.train[rci2<TH,ncol(ci.train)]
                     #,parms = list(prior = c(ProbC, 1 - ProbC))
