@@ -1,22 +1,44 @@
-#after pulling new docker 42n4/rstudio run this command
-#.rs.restartR()
+################################################################################
+# Casestudy from the Cichosz book "Data mining: explained in R" 
+################################################################################
+# after pulling new docker 42n4/rstudio run this command
+# .rs.restartR()
 ##############
-#20-3.R
+# 20-3.R
 ##############
-library(dmr.util)
-library(dmr.trans)
-library(dmr.regeval)
-library(dmr.rpartutil)
-library(rpart)
-library(rpart.plot)
-library(randomForest)
+
+# Install all packages from Cichosz book "Data mining: explained in R" 
+dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats','dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim',
+              'dmr.dectree','dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree','dmr.attrsel',
+              'dmr.ensemble','dmr.kernel','dmr.bayes','dmr.hierclus','dmr.miscost','dmr.rpartutil')
+pkgcheck <- dmrpkglist %in% row.names(installed.packages())
+dmrpkglist[!pkgcheck]
+for(i in dmrpkglist[!pkgcheck]){install_github(paste("42n4/", i, sep=""),force = TRUE)}
+dmrpkglist<-c("dmr.util",
+              "dmr.trans",
+              "dmr.regeval",
+              "dmr.rpartutil")
+for(i in dmrpkglist) library(i, character.only = TRUE);
+
+# First check to see if these packages are installed on this machine
+pkglist<-c("rpart",
+           "rpart.plot",
+           "randomForest")
+pkgcheck <- pkglist %in% row.names(installed.packages())
+pkglist[!pkgcheck]
+#COMMMENT the line below if you installed packages earlier e.g on root
+for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
+#this command is for root instalation of missing packages:
+if(length(pkglist[!pkgcheck])) cat("install.packages(c(");j=0; for(i in pkglist[!pkgcheck]) { j<-j+1 ;  if(j == length(pkglist[!pkgcheck])) cat(paste('"',i,'"',sep="")) else cat(paste('"',i,'",',sep=""));} ; cat("),depend=TRUE)")
+#loading all libraries - necessary to avoid errors of execution
+for(i in pkglist) library(i, character.only = TRUE);
 
 # http://archive.ics.uci.edu/ml/datasets/Communities+and+Crime+Unnormalized
 # read column names (extracted from the dataset communities.names)
-commnorm.names <- read.table("./commnorm.names",
+commnorm.names <- read.table("data/commnorm.names",
                              stringsAsFactors=FALSE)[,1]
 # read the actual data
-commnorm <- read.table("./communities.data",
+commnorm <- read.table("data/communities.data",
                        sep=",", na.strings="?", col.names=commnorm.names)
 # input attribute names
 cn.input.attrs <- names(commnorm)[6:127]

@@ -1,7 +1,7 @@
 #########################################################################################################################
 # The R minicourse in one shot (R basics, data structures, clustering, classification):
 #########################################################################################################################
-# Made and assembled from various sources by Piotr Wąsiewicz 
+# Made and assembled from various sources by Piotr Wasiewicz 
 # General rules:
 # - indices in R begin with 1, not with 0
 # - R language is case sensitive
@@ -26,6 +26,7 @@ pkglist[!pkgcheck]
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 #loading all libraries - necessary to avoid errors of execution
 for(i in pkglist) library(i, character.only = TRUE);
+par(ask=F)
 #########################################################################################################################
 # Basic commands in R
 # help function in R
@@ -225,8 +226,8 @@ solve(colmatrix,rowmatrix)       #solve the equation colmatrix %*% X = rowmatrix
 solve(rowmatrix,colmatrix)       #solve the equation rowmatrix %*% X = colmatrix
 solve(rowmatrix,rowmatrix)       #conversion into the same matrix through a diagonal one X=diag(2)
 diag(2)                          #the diagonal matrix
-det(colmatrix %*% rowmatrix)     #matrices determinants det(A · B) = detA · detB
-det(colmatrix) %*% det(rowmatrix)#det(A · B) = detA · detB
+det(colmatrix %*% rowmatrix)     #matrices determinants det(A . B) = detA . detB
+det(colmatrix) %*% det(rowmatrix)#det(A . B) = detA . detB
 #http://www.statmethods.net/advstats/matrix.html
 
 #########################################################################################################################
@@ -329,7 +330,7 @@ new_row <-                                  # a new row
   data.frame(
     pacjent_id = 5,
     age = 10,
-    type = 'Type3',
+    type = 'Typ3',
     state = 'Excellent'
   )
 patient <- rbind(patient, new_row)          # RBIND adds a new row to the dataframe
@@ -413,8 +414,8 @@ df[!is.na(df$age),]                         # removes rows with NA
 #########################################################################################################################
 #FACTORS - labels, classification concept, discrete variables 
 #features e.g. eye colour, sex, blood group
-#ordered – e.g. height levels: (low, medium, high)
-#discrete – e.g. a number of own children, a farms number, a man age 
+#ordered e.g. height levels: (low, medium, high)
+#discrete e.g. a number of own children, a farms number, a man age 
 #map of discrete vectors [1...k]
 #factors cannot be added or multiplied 
 #does not work  $, use [] with an index e.g. levels(x)[1]
@@ -499,7 +500,7 @@ legend(
 #draw many plots in one moment
 x2plot = seq(1:20)
 plot(f)                                     # the first plot
-dev.new()                                   # the second plot
+# dev.new()                                   # the second plot
 plot(f(x2plot/20))                          # switching with keyboard arrows
 Sys.sleep(2)                                # 2 seconds pause
 #dev.off()                                   # close the second draw
@@ -543,11 +544,12 @@ signal <- read.table('data.csv', header = FALSE, sep = ',')
 pdf('plotgraph1.pdf')
 x2plot = seq(1:20)
 plot(sin(x2plot))
-dev.off()
+
+dev.off(); par(ask=F)
 #the second picture file
 pdf('plotgraph2.pdf')
 plot(cos(x2plot))
-dev.off()
+dev.off();par(ask=F)
 
 
 #DATE and TIME
@@ -663,7 +665,7 @@ res
 #statistical functions: mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
 #probabilistic functions:
 #[dpqr]distribution_abbrebiation (d=density, p=distribution function, q=quantile function, r=random generation)
-#runif()- próba o równomiernym rozkładzie (random generation)
+#runif()-  uniform random generation sample
 #set.seed(5): set seed to receive always the same outcome
 #string functions:
 #nchar(x), nzchar(x), substr(x, start, stop), grep(pattern, x, ignore.case=FALSE, fixed=FALSE)
@@ -680,7 +682,7 @@ res
 #########################################################################################################################
 
 set.seed(12459);                            # the same outcome for repeated script execution 
-dev.off()                                   # in any case turn off the second picture
+dev.off() ; par(ask=F)                                  # in any case turn off the second picture
 
 #########################################################################################################################
 #DATA ANALYSIS
@@ -799,7 +801,7 @@ library(rgl)
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
 plot3d(mydata3kol, col=grupowanie3_kmeans_cluster, size = 10)     #interactive visualization in 3D 
 Sys.sleep(2)                                # 2 second pause
-dev.off()
+dev.off(); par(ask=F)
 #Clustering in R np. K-means in three dimensions based on PCA
 #http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
 library(nFactors)
@@ -913,7 +915,7 @@ myclassifier_ctree <- ctree(grupa ~ ., data=training_set, controls =
 plot(myclassifier_ctree)
 pdf('treec.pdf')
 plot(myclassifier_ctree)
-dev.off()
+dev.off(); par(ask=F)
 #plot(myclassifier_ctree, type="simple")
 pred_labels2 <- predict(myclassifier_ctree, testing_set)    # predict labels
 pred_labels2
@@ -974,7 +976,6 @@ round(pred_labels6)
 
 
 #ATTENTION! Various labels for the testing set were sometimes obtained from different functions despite the same input data 
-Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
 fit1=c();for(i in 1:nrow(pred_labels1))fit1=c(fit1,which(pred_labels1[i,]==1))
 separatelibrarylabels<-t(data.frame(rpart=as.numeric(fit1)))
 separatelibrarylabels<-rbind(separatelibrarylabels,ctree=as.numeric(pred_labels2))
@@ -1104,7 +1105,7 @@ t(data.frame(spr=as.numeric(clusterlabels)))
 #########################################################################################################################
 Sys.sleep(5)                                # 5 second pause
 
-
+dev.off(); par(ask=F)
 #########################################################################################################################
 #TIME SERIES - predict trends, make forecast, fit to the model
 #http://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/
@@ -1142,7 +1143,7 @@ adfTest(mydata);                               # ADF Test for p<0.01
 adfTest(log(mydata));                          # for the arima model
 adfTest(diff(mydata));                         # for difference between data
 adfTest(diff(log(mydata)));                    # the best results for differences on log(data)
-acf(mydata)                                    # Total Correlation Chart (Auto – correlation Function / ACF) 
+acf(mydata)                                    # Total Correlation Chart (Auto correlation Function / ACF) 
                                                # for successive corelations  x(t) z  x(t-1) , x(t-2)
 pacf(mydata)                                   # partial correlation function (PACF) below the line AR
 acf(log(mydata))                               # acf of log
@@ -1192,13 +1193,13 @@ Box.test(myforecast$residuals, lag=24, type="Ljung-Box")# for p<<0 autocorrelati
 Sys.sleep(2)                                   # 2 second pause
 
 
-#model_predykcji <- HoltWinters(mydata, beta=FALSE, gamma=FALSE)# gamma = FALSE nie okresowy model
-#model_predykcji <- HoltWinters(mydata, beta=FALSE)  # beta=FALSE wygładanie exponens
+#model_predykcji <- HoltWinters(mydata, beta=FALSE, gamma=FALSE)# gamma = FALSE not periodic model
+#model_predykcji <- HoltWinters(mydata, beta=FALSE)  # beta=FALSE smooth exponens
 #model_predykcji <- HoltWinters(mydata)        # 
 model_predykcji <- HoltWinters(mydata, seasonal = "mult")# periodic "multiplicative", default additive
 plot(model_predykcji)                          # red line for prediction
 model_predykcji$SSE                            # prediction quality
-myforecast<-forecast.HoltWinters(model_predykcjAi,h=8)# forecast for 8 periods
+myforecast<-forecast(model_predykcji,h=8)# forecast for 8 periods
 plot(myforecast)
 acf(myforecast$residuals, lag.max=20)          # checking the forecast
 Box.test(myforecast$residuals, lag=24, type="Ljung-Box")# for p<<0 autocorrelations - a bad predictor 
@@ -1225,7 +1226,8 @@ plotForecastErrors<-function(forecasterrors)   # into normal distribution
   # blue normal distribution 
   points(myhist$mids, myhist$density, type="l", col="blue", lwd=2)
 }
-plotForecastErrors(myforecast$residuals)       # is it similar to normal distribution
+plotForecastErrors(myforecast$residuals[!is.na(myforecast$residuals)]) 
+# is it similar to normal distribution
 
 library(forecast)
 model_predykcji=ets(mydata)                    # fully automatic prediction
