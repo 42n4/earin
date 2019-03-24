@@ -7,8 +7,12 @@
 ### EARIN materials
  - https://github.com/pwasiewi/earin
  - https://github.com/pwasiewi/dokerz/tree/master/rstudio
+ 
+### Data mining projects or helpful sites for case studies (in R, Python) [EARIN]
+ - https://github.com/pwasiewi/earin/blob/master/scripts/00kaggle_projects_to_learn.R
+ - https://github.com/pwasiewi/eulinks/tree/master/ai#data-mining-projects-for-case-studies-in-r-python
 
-### Helpful (in making projects) AI links
+### Other AI links: programming tools and ai methods
  - https://github.com/pwasiewi/eulinks/tree/master/ai
 
 
