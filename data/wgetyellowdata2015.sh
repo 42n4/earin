@@ -10,4 +10,5 @@
 #wget https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-10.csv
 #wget https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-11.csv
 #wget https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-12.csv
-wget -c http://download2260.mediafire.com/eboubywk2odg/rzle0hm11onl101/yellow_tripdata_2015.xdf
+#wget -c http://download2260.mediafire.com/eboubywk2odg/rzle0hm11onl101/yellow_tripdata_2015.xdf
+echo Get file in your browser: http://www.mediafire.com/file/rzle0hm11onl101/yellow_tripdata_2015.xdf/file
