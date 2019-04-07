@@ -101,9 +101,8 @@ bin/docker_clean
 ```
 ## Alternatives for RSTUDIO e.g. https://github.com/jupyter/docker-stacks
 #### Examples in https://github.com/ipython-books/cookbook-2nd-code
-```
 docker run -it --rm -p 8888:8888 -p 4040:4040 -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g) -v $(pwd):/home/jovyan/workspace jupyter/all-spark-notebook
 
-#Jupyter with graphical gui
+#### Jupyter with the graphical gui
 docker run -it --rm -p 8888:8888 -p 4040:4040 -e JUPYTER_ENABLE_LAB=yes -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g)  -v $(pwd):/home/jovyan/work jupyter/all-spark-notebook
-```
+
