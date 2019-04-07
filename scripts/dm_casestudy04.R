@@ -66,7 +66,8 @@ for(i in pkglist) library(i, character.only = TRUE);
 ##########################################################################################################
 #My functions
 ##########################################################################################################
-
+#3 plots in two column
+dev.off(); par(mfrow = c(3, 2))
 
 #function removes columns with zero data
 remove_colzero<-function(df_test){
@@ -230,8 +231,6 @@ ProbC=1-ifelse(ProbC<0.2, 0.2, ProbC)
 get_time()
 
 ##########################################################################################################
-#3 plots in two column
-dev.off(); par(mfrow = c(3, 2))
 #rpart works with weigths or priors  - prior probabilities of output class classes: sum(priors)=1
 #maximum size of tree with minsplit=2, cp=0 and priors
 
@@ -244,20 +243,23 @@ ctrl <- trainControl(method = "repeatedcv"
                      , allowParallel=TRUE
                      #, summaryFunction=twoClassSummary
 )
-# caretrpart <- NULL
+
+caretrpart <- NULL
 # caretrpart <- train(method = 'rpart2',
 #                     x = ci.train[,-ncol(ci.train)],
 #                     y = ci.train[,ncol(ci.train)],
 #                     parms = list(prior = c(ProbC, 1 - ProbC))
 #                     #, tuneGrid = data.frame(cp = c(0.0005669276, 0.0006669276, 0.0007669276))
 #                     #, tuneGrid = data.frame(cp = seq(0.0004,0.0005,0.00001))
-#                     , control = rpart.control(minsplit = 10)
+#                     
+#                     #, control = rpart.control(minsplit = 10)
+#                     , verbose=TRUE
 #                     #,type = "Classification"
 #                     #,tuneLength=10
 #                     #,metric="ROC"
 #                     #,preProc = c("center", "scale")
 #                     #, trControl= trainControl(method="boot", number=10)
-#                     #,trControl = ctrl
+#                     ,trControl = ctrl
 # )
 # #plot(caretrpart)
 # #summary(caretrpart)
@@ -266,19 +268,20 @@ ctrl <- trainControl(method = "repeatedcv"
 # ci.train.caretrpart.cm
 # ci.train.caretrpart.roc <- show_roc(caretrpart,ci.val, "ROC caret rpart2")
 # dmr.claseval::auc(ci.train.caretrpart.roc)
-# 
-# get_time()
+
+get_time()
 
 ##########################################################################################################
 #ctree only tunes over mincriterion and ctree2 tunes over maxdepth (while fixing mincriterion = 0)
-caretctree <- train(method = 'ctree2', 
-                    x = ci.train[,-ncol(ci.train)], 
-                    y = ci.train[,ncol(ci.train)]   
+caretctree <- train(method = 'ctree2' 
+                    , x = ci.train[,-ncol(ci.train)]
+                    , y = ci.train[,ncol(ci.train)]   
                     , weights=weights100
                     #, trControl= trainControl(method = "repeatedcv", number = 10, repeats = 10)
                     #,controls=ctree_control(minbucket=3)
                     #,controls=ctree_control(minbucket=3, maxdepth = 3, maxsurrogate = 3, mincriterion=0.95,savesplitstats=FALSE)
-                    ,trControl = ctrl
+                    , trControl = ctrl
+                    , verbose = TRUE
 )
 #https://stats.stackexchange.com/questions/171301/interpreting-ctree-partykit-output-in-r
 
@@ -292,12 +295,13 @@ get_time()
 
 ##########################################################################################################
 # caretlda <- NULL
-# caretlda <- train(method = 'lda', 
-#                   x = ci.train[,-ncol(ci.train)], 
-#                   y = ci.train[,ncol(ci.train)]
-#                   , parms = list(prior = c(ProbC, 1 - ProbC))
+# caretlda <- train(method = 'lda'
+#                   , x = ci.train[,-ncol(ci.train)]
+#                   , y = ci.train[,ncol(ci.train)]
+#                   #, parms = list(prior = c(ProbC, 1 - ProbC))
 #                   #, weights=weights100
-#                   ,trControl = ctrl
+#                   , trControl = ctrl
+#                   , verbose = TRUE
 # )
 # ci.train.caretlda.cm <- get_cm(caretlda,ci.val,"raw")
 # ci.train.caretlda.cm
@@ -340,8 +344,8 @@ caretreebag <- train(method = 'treebag',
                      #,tuneGrid=grid
                      #, metric="ROC"
                      ,weights=weights100
-                     ,trControl = ctrl
-                     #,verbose=FALSE
+                     ,trControl = ctrl,
+                     ,verbose=TRUE
 )
 ci.train.caretreebag.cm <- get_cm(caretreebag,ci.val,"raw")
 ci.train.caretreebag.cm
@@ -379,8 +383,7 @@ Sys.sleep(5)                                # 5 second pause
 
 ##########################################################################################################
 #again for unbalanced data
-#3 plots in two column
-dev.off(); par(mfrow = c(3, 2))
+
 rci1 <- runif(nrow(magic2))
 ci.train1 <- magic2[rci1>=0.33,]
 ci.val1 <- magic2[rci1<0.33,]
