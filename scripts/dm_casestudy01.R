@@ -4,7 +4,7 @@
 #after pulling new docker 42n4/rstudio run this command
 #.rs.restartR()
 #http://www.wekaleamstudios.co.uk/supplementary-material/
-
+options(encoding = "UTF-8"); par(ask=F)
 # Install all packages from Cichosz book "Data mining: explained in R" 
 dmrpkglist<-c('dmr.data','dmr.util','dmr.claseval','dmr.stats','dmr.trans','dmr.linreg','dmr.regeval','dmr.dissim',
               'dmr.dectree','dmr.linclas','dmr.disc','dmr.kcenters','dmr.cluseval','dmr.regtree','dmr.attrsel',
@@ -182,10 +182,6 @@ ci.tree.d.fmeasure <- f.measure(ci.tree.d.cm)
 #(0,0) - the classifier always predicts class 0 
 #(1,1) - the classifier always predicts class 1
 
-ci.tree.d.prob<-predict(ci.tree.d, ci.val)[,2]
-
-pred.s <- ci.tree.d.prob
-true.y <- ci.val$income
 roc <- function(pred.s, true.y)
 {
   cutoff <- Inf  # start with all instances classified as negative
@@ -214,6 +210,21 @@ roc <- function(pred.s, true.y)
   }
   rt <- rbind(rt, data.frame(tpr=tp/(tp+fn), fpr=fp/(fp+tn), cutoff=cutoff))
 }
+
+as.integer(factor(c("low","high","low","high"),levels = c("low","high")))
+
+pred.s<-c(0.8,0.9,0.5,0.3,0.1,0.2)
+true.y<-c(2,2,2,1,1,1)
+pred.s<-c(0.1,0.2,0.5,0.3,0.3,0.7)
+true.y<-c(1,1,1,2,2,2)
+order(pred.s, decreasing=TRUE)
+myroc<-roc(pred.s,true.y)
+plot(myroc$fpr, myroc$tpr, type="l", xlab="FP rate", ylab="TP rate")
+
+ci.tree.d.prob<-predict(ci.tree.d, ci.val)[,2]
+
+pred.s <- ci.tree.d.prob
+true.y <- ci.val$income
 
 ci.tree.d.roc <- roc(ci.tree.d.prob, ci.val$income)
 plot(ci.tree.d.roc$fpr, ci.tree.d.roc$tpr, type="l", xlab="FP rate", ylab="TP rate")
