@@ -51,6 +51,10 @@ docker run -d -p 8787:8787 -v /sys/dev:/sys/dev --device=/dev/dri  --device=/dev
 
 #### If you want the opencl support for NVIDIA, you need to install nvidia-docker2 package from the NVidia PPA (https://github.com/NVIDIA/nvidia-docker) and add '--runtime=nvidia' to the docker command.
 
+#### For newer linux dists with cgroups v2:
+ - https://medium.com/nttlabs/cgroup-v2-596d035be4d7
+ - https://github.com/docker/for-linux/issues/219#issuecomment-545922969
+
 ## Start the docker in MSWindows (Docker for Windows) with Linux containers enabled and Powershell and shared disk c: in docker settings (login: rstudio pass: rstudio)
 ![Screen](https://github.com/pwasiewi/dokerz/raw/master/rstudio/linux_docker_in_windows10.png)
 ```
@@ -101,8 +105,8 @@ bin/docker_clean
 ```
 ## Alternatives for RSTUDIO e.g. https://github.com/jupyter/docker-stacks
 #### Examples in https://github.com/ipython-books/cookbook-2nd-code
-docker run -it --rm -p 8888:8888 -p 4040:4040 -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g) -v $(pwd):/home/jovyan/workspace jupyter/all-spark-notebook
+docker run -it --rm -p 8888:8888 -p 4040:4040 -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g) -v $(pwd):/home/guest/workspace 42n4/all-spark-notebook
 
 #### Jupyter with the graphical gui
-docker run -it --rm -p 8888:8888 -p 4040:4040 -e JUPYTER_ENABLE_LAB=yes -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g)  -v $(pwd):/home/jovyan/work jupyter/all-spark-notebook
+docker run -it --rm -p 8888:8888 -p 4040:4040 -e JUPYTER_ENABLE_LAB=yes -e NB_USER=$(whoami) -e NB_UID=$(id -u) -e NB_GID=$(id -g)  -v $(pwd):/home/guest/work 42n4/all-spark-notebook
 
