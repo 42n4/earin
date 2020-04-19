@@ -21,7 +21,10 @@ pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 
+dev.off()
 par(mfrow = c(3, 1)) #three pictures in one column
+
+
 #set the beginning of the random generator in order to obtain the same results at each run
 seed.val <- 1234
 set.seed(seed.val)
@@ -32,6 +35,7 @@ sigmoid <- function(x) {
 }
 #generates x from -10 to 10 step 0.1
 x <- seq(-10,10,0.1)
+par(mar = rep(2, 4))
 plot(x,sigmoid(x))
 
 #input of the exemplary neural network BIAS=1, X1=0, X2=0, where bias is equal to 1, but its weight is changing
